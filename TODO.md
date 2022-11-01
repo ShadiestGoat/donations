@@ -1,0 +1,30 @@
+- [ ] WS
+  - [ ] New Don
+  - [ ] New Fund
+- [ ] HTTP
+  - [ ] /api
+    - [x] /donors
+      - [x] GET /discord/{id}
+      - [x] GET /donor/{id}
+      - [x] GET /paypal/{id}
+    - [x] /funds
+      - [x] GET /
+      - [x] GET /default
+      - [x] POST /
+      - [x] /{id} (id = real id or 'default' for the default one)
+        - [x] GET /
+        - [x] PUT /
+        - [x] POST /default
+    - [x] POST /CUSTOM-PAYPAL-ENDPOINT
+    - [ ] discord oauth2
+  - [ ] / (frontend stuff here)
+    - [ ] / (default fund)
+    - [ ] /funds (all funds) (?complete=true/false)
+    - [ ] /funds/{id} (chosen fund)
+- [ ] Discord Bot:
+  - [ ] /donate
+  - [ ] /donor user:@user
+    - [ ] Display embed w/ paginated results of donations w/ messages
+  - [ ] /fund fund:{name (val=id)/default}
+  - [ ] /funds complete:bool (if true, only display completed. If false, then display uncompleted ones. If not mentioned, display all)
+    - [ ] Display embed w/ paginated results of funds (id, name, description)

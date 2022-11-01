@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Shady Goat" />
+    <title>Donations</title>
+
+    <meta content="Donate for '{{%FUND_NAME}}'" property="og:title" />
+    <meta content="{{%FUND_DESC}}" property="og:description" />
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
+    <link media="all" rel="stylesheet" href="main.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      .pfp {
+        width: 7vh;
+        border-radius: 50%;
+        display: block;
+        animation: pfp-anim 1.5s;
+        margin-right: 0.75vw;
+        transform-origin: center;
+      }
+      .fund-desc {
+        text-align: center;
+        margin-top: 1vh;
+      }
+      .welcome-msg {
+        display: grid;
+        grid-template-columns: 1fr 0.5vw 1fr;
+        width: 80vw;
+        margin: 4vh auto 0 auto;
+        height: 8vh;
+        align-items: center;
+      }
+      .container {
+        width: 100vw;
+        min-height: 90vh;
+      }
+      .name {
+        font-size: 1.9rem;
+      }
+
+      @keyframes pfp-anim {
+        0% {
+          transform: translateX(25vw) rotate(1260deg);
+          opacity: 0.25;
+        }
+
+        100% {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      
+      @keyframes text-anim-right {
+        0% {
+          transform: translateX(calc(var(--text-anim-h)*-1));
+        }
+
+        100% {
+          transform: none;
+        }
+      }
+
+      @keyframes mid-anim {
+        from {
+          height: 100%;
+        }
+        75% {
+          height: 100%;
+        }
+        to {
+          height: 0%;
+        }
+      }
+
+      @keyframes not-you-anim {
+        from {
+          transform: translateY(-6vh);
+        }
+        75% {
+          transform: translateY(-6vh);
+        }
+        to {
+          transform: none;
+        }
+      }
+
+      .mid {
+        height: 0%;
+        width: 0.5vw;
+        background: var(--white);
+        animation: mid-anim 2s;
+      }
+      .welcome-msg div {
+        display: flex;
+        align-items: center;
+      }
+      
+      .left, .right {
+        height: 100%;
+        /* width: 34.75vw; */
+        overflow: hidden;
+      }
+
+      .left {
+        justify-content: right;
+      }
+      .right {
+        justify-content: left;
+      }
+
+      .right h2 {
+        margin-left: 0.75vw;
+        animation: text-anim-right 1.5s;
+      }
+
+
+      .not-you {
+        animation: not-you-anim 2s;
+      }
+
+      .not-you a {
+        font-size: 0.75rem;
+        color: var(--accent-2);
+      }
+
+      .not-you-wrapper {
+        width: 100vw;
+        text-align: center;
+        overflow-y: hidden;
+      }
+
+      textarea, input {
+        outline: 0;
+        border: 0;
+        width: 100%;
+        text-align: center;
+        background-color: var(--accent-1);
+        color: var(--white);
+        padding: 8px;
+      }
+
+      #msg {
+        resize: none;
+        min-height: 8vh;
+        max-height: 45vh;
+        font-size: 1.3rem;
+        border-radius: 25px;
+        margin-top: 3.5vh;
+
+        display: block;
+        line-height: 1.1;
+      }
+
+      input {
+        grid-column: 2;
+        border-top-left-radius: 25px;
+        border-bottom-left-radius: 25px;
+        font-size: 1.45rem;
+      } 
+      
+      .amount-wrapper {
+        display: grid;
+        height: 7vh;
+        grid-template-columns: 1.25fr 0.75fr 0.75fr 1.25fr;
+        margin: 7vh 0 2vh;
+      }
+
+      .text-w {
+        padding-bottom: 4px;
+        width: 70vw;
+        max-width: 900px;
+        margin: 2vh auto 0;
+        border-radius: 25px;
+        transition: all 0.125s;
+        background-position-y: bottom;
+      }
+      .currency {
+        border-top-right-radius: 25px;
+        border-bottom-right-radius: 25px;
+        background-color: var(--accent-4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: var(--accent-1) 2px solid;
+      }
+      .currency p {
+        font-size: 1.5rem;
+        font-family: monospace;
+      }
+      .err {
+        font-size: 0.65rem;
+        color: var(--danger);
+        text-align: center;
+      }
+
+      #paypal-button-container {
+        bottom: -10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="welcome-msg">
+        <div class="left">
+          <img class="pfp" src="{{%D_PFP}}">
+        </div>
+        <div class="mid"></div>
+        <div class="right">
+          <h2 class="name"><i>{{%D_NAME}}</i></h2>
+        </div>
+      </div>
+      <div class="not-you-wrapper">
+        <h4 class="not-you"><a id="not-you" href="/login">(not you?)</a></h4>
+      </div>
+
+      <h1 class="fund-desc">{{%FUND_DESC}}</h1>
+
+      <div class="amount-wrapper">
+        <input id="amount" step="0.5" type="number" value="2.5" min="2" max="100"  />
+        <div class="currency"><p>{{%CURRENCY}}</p></div>
+      </div>
+      <h2 class="err" id="amt-err"></h2>
+
+      <div class="text-w">
+        <textarea type="text" placeholder="Message Here" id="msg" maxlength="112"></textarea>
+      </div>
+      <h2 class="err" id="msg-err"></h2>
+      
+      <div
+          style="text-align: center; margin-top: 4vh"
+          id="paypal-button-container"
+      ></div>
+    </div>
+
+
+    <script
+      src="https://www.paypal.com/sdk/js?client-id={{%PP_CLIENT_ID}}&enable-funding=venmo&currency={{%CURRENCY}}"
+      data-sdk-integration-source="button-factory"
+    ></script>
+
+    <script>
+      const msgElem = document.getElementById("msg")
+      const amtElem = document.getElementById("amount")
+      const errMsgElem = document.getElementById("msg-err")
+      const errAmtElem = document.getElementById("amt-err")
+      const discordID = `{{%D_ID}}`
+      
+      if (!discordID) {
+        document.getElementById("not-you").innerHTML = "(Wish to login?)"
+      }
+
+      function isValid() {
+          if (msgElem.value.length == 0) {
+            errMsgElem.innerHTML = "Please type a message!"
+            return false
+          } else {
+            errMsgElem.innerHTML = ""
+          }
+          if (amtElem.value.length == 0) {
+            errAmtElem.innerHTML = "Invalid amount!"
+            return false
+          } else {
+            errAmtElem.innerHTML = ""
+          }
+          const fl = parseFloat(amtElem.value)
+          if (Number.isNaN(fl)) {
+            errAmtElem.innerHTML = "Invalid amount!"
+            return false
+          } else {
+            errAmtElem.innerHTML = ""
+          }
+          if (fl < 2) {
+            errAmtElem.innerHTML = "Too small!"
+            return false
+          } else {
+            errAmtElem.innerHTML = ""
+          }
+          if (fl > 1000) {
+            errAmtElem.innerHTML = "Too large!"
+            return false
+          } else {
+            errAmtElem.innerHTML = ""
+          }
+          return true
+      }
+
+      function msgElemStuff() {
+        msgElem.style.height = "5px";
+        msgElem.style.height = (msgElem.scrollHeight+3)+"px";
+        const perc = (msgElem.value.length / 112)*100
+        
+        const epic = [["green", 35], ["orange", 55], ["red", 100]]
+        let content = ""
+
+        let percCat = 0
+        while (perc > epic[percCat][1]) {
+          content += `${epic[percCat][0]} ${epic[percCat][1]}%, `
+          percCat++
+        }
+        
+        content += `${epic[percCat][0]} ${Math.round(perc)}%`
+        if (Math.round(perc) != 100) {
+          content += `, transparent ${Math.round(perc) + 1}%`
+        }
+
+        if (perc == 0) {
+          content = ""
+        } else {
+          content = `background: radial-gradient(circle at 50% calc(100% - 2px), ${content}) bottom`
+        }
+
+        msgElem.parentElement.style = content
+      }
+
+      msgElemStuff()
+
+      msgElem.addEventListener("input", function (e) {
+        msgElemStuff()
+      })
+
+      function initPayPalButton() {
+        var purchase_units = [
+          {
+            amount: {
+              currency_code: "{{%CURRENCY}}",
+              value: 1,
+              breakdown: {
+                item_total: {
+                  currency_code: "{{%CURRENCY}}",
+                  value: 1,
+                },
+              },
+            },
+            items: [
+              {
+                name: "{{%D_ID}}-{{%FUND_ID}}",
+                unit_amount: {
+                  currency_code: "{{%CURRENCY}}",
+                  value: 1,
+                },
+                quantity: "1",
+                category: "DONATION",
+              },
+            ],
+          },
+        ];
+
+        paypal
+          .Buttons({
+            style: {
+              color: "blue",
+              shape: "pill",
+              label: "donate",
+              layout: "vertical",
+            },
+
+            onInit: function (data, actions) {
+              if (!isValid()) {
+                actions.disable();
+              }
+
+              [msgElem, amtElem].forEach(v => {
+                v.addEventListener("keyup", function () {
+                  if (isValid()) {
+                      actions.enable();
+                  } else {
+                      actions.disable()
+                  }
+                })
+              })
+            },
+
+            onClick: function (e) {
+              const msgContent = msgElem.value.trim()
+              if (!isValid()) {
+                return
+              }
+              let am = parseFloat(amount.value);
+
+              am = Math.round(am * 100) / 100;
+
+              purchase_units[0].description = msgContent;
+              purchase_units[0].amount.value = am.toString();
+              purchase_units[0].amount.breakdown.item_total.value = am.toString();
+              purchase_units[0].items[0].unit_amount.value = am.toString();
+            },
+
+            createOrder: function (data, actions) {
+              return actions.order.create({
+                purchase_units: purchase_units,
+              });
+            },
+            
+            onApprove: function (data, actions) {
+              return actions.order.capture().then(function (orderData) {
+                actions.redirect('thanks.html?fund={{%FUND_ID}}')
+              });
+            },
+
+            onCancel(one, two) {
+              var elemT = document.getElementById("paypal-button-container")
+                .childNodes[0];
+              elemT.style.backgroundColor = "transparent";
+              elemT.style.borderRadius = "0px";
+            },
+
+            onError: function (err) {
+              console.log(err);
+            },
+          })
+          .render("#paypal-button-container");
+      }
+      initPayPalButton();
+    </script>
+  </body>
+</html>

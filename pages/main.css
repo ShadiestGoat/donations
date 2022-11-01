@@ -1,0 +1,31 @@
+:root {
+    --accent-1: #5a596a;
+    --accent-2: #5955ba;
+    --accent-3: #444088;
+    --accent-4: #2e2c39;
+    --accent-5: #26252b;
+    --accent-6: #000000;
+    --success: #6bee6e;
+    --danger: #ee6e6b;
+    --white: #f6f3ff;
+    --text-anim-v: 3vh;
+    --text-anim-h: 25vw;
+
+    background-color: var(--accent-5);
+    font-size: clamp(14px, 2.4vh, 1.8vw);
+}
+
+body {
+    margin: 0;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    color: var(--white);
+    margin: 0;
+}
+
+*,
+:after,
+:before {
+    box-sizing: border-box;
+}
