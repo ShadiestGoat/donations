@@ -400,7 +400,7 @@
             
             onApprove: function (data, actions) {
               return actions.order.capture().then(function (orderData) {
-                actions.redirect('thanks.html?fund={{%FUND_ID}}')
+                actions.redirect('/thanks?fund={{%FUND_ID}}')
               });
             },
 

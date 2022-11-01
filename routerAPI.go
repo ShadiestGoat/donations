@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -94,6 +95,7 @@ func RouterAPI() http.Handler {
 			return
 		}
 		b, _ := io.ReadAll(r.Body)
+		fmt.Println(string(b))
 		if len(b) == 0 {
 			RespondErr(w, ErrBadBody)
 			return
