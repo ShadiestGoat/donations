@@ -1,4 +1,4 @@
-module shadygoat.eu/DonationAPI
+module github.com/ShadiestGoat/DonationAPI
 
 go 1.19
 
