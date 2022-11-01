@@ -123,7 +123,7 @@ func RouterAPI() http.Handler {
 
 		donorID, cycle := "", 0
 
-		err = DBQueryRow(`SELECT id, cycle FROM donors WHERE discord_id = $1 AND paypal = $2`).Scan(&donorID, &cycle)
+		err = DBQueryRow(`SELECT id, cycle FROM donors WHERE discord_id = $1 AND paypal = $2`, donation.DiscordID, donation.PayerID).Scan(&donorID, &cycle)
 
 		newPayer := false
 
