@@ -109,7 +109,7 @@ func RouterAPI() http.Handler {
 
 		donation := rawPayPal.Parse()
 		if donation == nil {
-			logger.Logf(LL_WARN, "An illegal paypal event has been received!\n-> |"+string(b)+"| <-")
+			logger.Logf(LL_WARN, "An illegal paypal event has been received! (Parse)\n-> |"+string(b)+"| <-")
 			RespondErr(w, ErrBadBody)
 			return
 		} else {
