@@ -1,6 +1,8 @@
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 // the name of the allowed pp event
 const PP_EVENT_FILTER = "CHECKOUT.ORDER.APPROVED"
@@ -18,7 +20,7 @@ type Resource struct {
 
 type PurchaseUnit struct {
 	Description string     `json:"description"`
-	Payments    []*Payment `json:"payments"`
+	Payments    *Payment   `json:"payments"`
 	Items       []*Item    `json:"items"`
 }
 
@@ -83,10 +85,13 @@ func (e PPEventRaw) Parse() *PPDonation {
 	if len(unit.Items) == 0 {
 		return nil
 	}
-	if len(unit.Payments) == 0 {
+	if unit.Payments == nil {
 		return nil
 	}
-	capture := unit.Payments[0].Captures[0]
+	if len(unit.Payments.Captures) == 0 {
+		return nil
+	}
+	capture := unit.Payments.Captures[0]
 	
 	spl := strings.Split(unit.Items[0].Name, "-")
 	count := 0
