@@ -27,7 +27,6 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 		oID = "anon"
 	} else {
 		b, _ := io.ReadAll(resp.Body)
-		fmt.Println(string(b))
 		if len(b) == 0 {
 			oID = "anon"
 		} else {
