@@ -158,7 +158,7 @@ func RouterBase() *chi.Mux {
 			return
 		}
 
-		dID, _, _ := FetchDiscordUser("@me", auth.Token)
+		dID, _, _ := FetchDiscordUser("@me", "Bearer " + auth.Token)
 
 		fund := q.Get("fund")
 

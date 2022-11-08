@@ -52,5 +52,5 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 }
 
 type DiscordOAuth2 struct {
-	Token string `json:"token"`
+	Token string `json:"access_token"`
 }
