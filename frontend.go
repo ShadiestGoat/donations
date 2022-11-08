@@ -26,7 +26,7 @@ func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
 	return &ComponentGoal{
 		GoalValue:   Round(goal, 2),
 		XPercOffset: Round(textOffset, 2),
-		Perc:        Round(perc*100, 2),
+		Perc:        Round(perc*100, 0),
 	}
 }
 
