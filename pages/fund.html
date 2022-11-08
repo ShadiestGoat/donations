@@ -289,7 +289,7 @@
       const errAmtElem = document.getElementById("amt-err")
       const discordID = `{{ .DiscordID }}`
       
-      if (!discordID) {
+      if (!discordID || discordID == "anon") {
         document.getElementById("not-you").innerHTML = "(Wish to login?)"
       }
 
