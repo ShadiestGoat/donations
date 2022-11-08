@@ -14,7 +14,7 @@ func main() {
 	InitAuths()
 	InitSnowflake()
 	logger.Logf(LL_DEBUG, "SnowNode loaded!")
-	// InitFrontend()
+	InitFrontend()
 	logger.Logf(LL_DEBUG, "Frontend loaded!")
 
 	InitDB()

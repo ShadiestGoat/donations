@@ -65,7 +65,7 @@ var (
 	PAGE_FUND *template.Template
 )
 
-func init() {
+func InitFrontend() {
 	b, err := os.ReadFile("pages/main.css")
 	PanicIfErr(err)
 	MAIN_CSS = b
