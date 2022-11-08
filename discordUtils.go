@@ -20,7 +20,10 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 	req.Header.Set("Authorization", token)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Println("????")
+		if err == nil && resp.Body != nil {
+			b, _ := io.ReadAll(resp.Body)
+			fmt.Println(string(b))	
+		}
 		oID = "anon"
 	} else {
 		b, _ := io.ReadAll(resp.Body)
