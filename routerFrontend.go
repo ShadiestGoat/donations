@@ -217,17 +217,7 @@ func RouterBase() *chi.Mux {
 
 		dID, _, _ := FetchDiscordUser("@me", "Bearer "+auth.Token)
 
-		fund := q.Get("fund")
-
-		red := "/"
-
-		if fund != "" {
-			red = "/funds/" + fund
-		}
-
-		red += "?id=" + dID
-
-		http.Redirect(w, r, red, http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/?id" + dID, http.StatusTemporaryRedirect)
 	})
 
 	r.Get("/defaultPFP.png", func(w http.ResponseWriter, r *http.Request) {
