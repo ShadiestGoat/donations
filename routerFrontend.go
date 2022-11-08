@@ -68,8 +68,11 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 		dID, discordName, discordPFP = FetchDiscordUser(dID, "Bot "+DISCORD_TOKEN)
 	}
 
+	var goalComp *ComponentGoal
+
 	if fund.Goal != 0 {
 		fund.PopulateAmount()
+		goalComp = NewComponentGoal(fund.Goal, *fund.Amount)
 	}
 
 	FrontendRespond(w, r, PAGE_FUND, "fund", PageFund{
@@ -79,7 +82,7 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 		FundID:      fundID,
 		FundDesc:    fund.Description,
 		FundName:    fund.Name,
-		Goal:        NewComponentGoal(fund.Goal, *fund.Amount),
+		Goal:        goalComp,
 	})
 }
 
