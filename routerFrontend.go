@@ -131,7 +131,7 @@ func RouterBase() *chi.Mux {
 
 		vals.Set("client_id", D_CLIENT_ID)
 		vals.Set("client_secret", D_CLIENT_SECRET)
-		vals.Set("authorization_code", "authorization_code")
+		vals.Set("grant_type", "authorization_code")
 		vals.Set("code", q.Get("code"))
 		vals.Set("redirect_uri", DISCORD_OAUTH_LINK)
 
