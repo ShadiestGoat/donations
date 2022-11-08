@@ -1,0 +1,19 @@
+<div class="goal">
+    <h3 class="txt">0</h3>
+
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width: 45vw;height: 100%;" viewBox="0 0 120 24">
+        <pattern id="diagonalHatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="translate(0)">
+            <animateTransform attributeType="xml"
+                attributeName="patternTransform"
+                type="translate" from="0" to="30" begin="0"
+                dur="15s" repeatCount="indefinite"/>
+            <rect width="100%" height="100%" fill="var(--frost-3)" ></rect>
+            <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:var(--frost-4); stroke-width:1.5" />
+        </pattern>
+        <rect width="{{%WIDTH}}" x="1" rx="8" height="16" y="4" stroke-width="1" stroke="#fff00000" fill="url(#diagonalHatch)"></rect>
+        <rect width="{{%GOAL_WIDTH}}"        x="1" rx="8" height="16" y="4" stroke-width="1" stroke="#fff" fill="none"></rect>
+        {{%TEXT_SVG}}
+    </svg>
+
+    <h3 class="txt">{{%GOAL_MAX}}</h3>
+</div>

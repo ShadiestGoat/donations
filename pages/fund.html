@@ -27,7 +27,7 @@
       }
       .fund-desc {
         text-align: center;
-        margin-top: 1vh;
+        margin-top: 3vh;
       }
       .welcome-msg {
         display: grid;
@@ -120,7 +120,6 @@
         animation: text-anim-right 1.5s;
       }
 
-
       .not-you {
         animation: not-you-anim 2s;
       }
@@ -169,7 +168,7 @@
         display: grid;
         height: 7vh;
         grid-template-columns: 1.25fr 0.75fr 0.75fr 1.25fr;
-        margin: 7vh 0 2vh;
+        margin: 4vh 0 2vh;
       }
 
       .text-w {
@@ -221,6 +220,8 @@
       </div>
 
       <h1 class="fund-desc">{{%FUND_DESC}}</h1>
+
+      {{%GOAL_COMP}}
 
       <div class="amount-wrapper">
         <input id="amount" step="0.5" type="number" value="2.5" min="2" max="100"  />
