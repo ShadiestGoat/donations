@@ -103,5 +103,5 @@ func InitConfig() {
 		logger.Logf(LL_WARN, "DEBUG_DISC_MENTION is empty! No one will be mentioned. On debug info")
 	}
 
-	DISCORD_OAUTH_LINK = "https://discord.com/oauth2/authorize?client_id=" + D_CLIENT_ID + "&response_type=code&scope=identify&redirect_uri=" + url.QueryEscape(PROTOCOL_HOSTNAME + "/login")
+	DISCORD_OAUTH_LINK = "https://discord.com/api/oauth2/authorize?client_id=" + D_CLIENT_ID + "&response_type=code&scope=identify&redirect_uri=" + url.QueryEscape(PROTOCOL_HOSTNAME + "/login")
 }

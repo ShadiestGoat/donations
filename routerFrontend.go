@@ -141,10 +141,12 @@ func RouterBase() *chi.Mux {
 		req.Header.Set("Content-Type", "applications/x-www-form-urlencoded")
 
 		resp, err := http.DefaultClient.Do(req)
-		fmt.Println(err)
-		fmt.Println(resp.StatusCode)
-		
+
 		if err != nil || resp.StatusCode != 200 || resp.Body == nil {
+			if err == nil && resp.Body != nil {
+				b, _ := io.ReadAll(resp.Body)
+				fmt.Println(resp.StatusCode, string(b))
+			}
 			logger.Logf(LL_ERROR, "Couldn't login user!")
 			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
 			return
