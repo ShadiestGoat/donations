@@ -75,7 +75,7 @@ func FundMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func FetchFunds(before, after string, complete *bool) []*Fund {
+func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund {
 	q := `SELECT id,def,goal,quick_name,title,description FROM funds`
 	args := []any{}
 	checks := []string{}
@@ -110,6 +110,9 @@ func FetchFunds(before, after string, complete *bool) []*Fund {
 	for rows.Next() {
 		fund := &Fund{}
 		rows.Scan(&fund.ID, &fund.Default, &fund.Goal, &fund.Name, &fund.Title, &fund.Description)
+		if fetchAmounts {
+			fund.PopulateAmount()
+		}
 		funds = append(funds, fund)
 	}
 
@@ -125,6 +128,7 @@ func RouterFunds() http.Handler {
 		before := r.URL.Query().Get("before")
 		after := r.URL.Query().Get("after")
 		completeRaw := r.URL.Query().Get("complete")
+		amounts := !(r.URL.Query().Get("amount") == "f" || r.URL.Query().Get("amount") == "false")
 
 		var complete *bool
 
@@ -133,7 +137,7 @@ func RouterFunds() http.Handler {
 			complete = &val
 		}
 
-		RespondJSON(w, 200, FetchFunds(before, after, complete))
+		RespondJSON(w, 200, FetchFunds(before, after, complete, amounts))
 	})
 
 	// Create a new fund

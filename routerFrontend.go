@@ -99,9 +99,22 @@ func RouterBase() *chi.Mux {
 	})
 
 	r.Get("/funds", func(w http.ResponseWriter, r *http.Request) {
-		// FrontendFund(w, r, "default")
-		// TODO:
-		Respond(w, 200, PAGE_FUNDS)
+		rows, _ := DBQuery(`SELECT id,goal,title,description FROM funds WHERE complete = 'false' order by id LIMIT 50`)
+		funds := []*PageFundsFund{}
+		for rows.Next() {
+			goal := 0.0
+			frontendFund := &PageFundsFund{}
+			rows.Scan(&frontendFund.ID, &goal, &frontendFund.Title, &frontendFund.Desc)
+			if goal != 0 {
+				fund := &Fund{
+					ID: frontendFund.ID,
+				}
+				fund.PopulateAmount()
+				frontendFund.Goal = NewComponentGoal(goal, *fund.Amount)
+			}
+			funds = append(funds, frontendFund)
+		}
+		FrontendRespond(w, r, PAGE_FUNDS, "funds", funds)
 	})
 
 	r.Get(`/f/{quickName}`, func(w http.ResponseWriter, r *http.Request) {

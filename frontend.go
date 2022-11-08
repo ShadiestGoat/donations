@@ -8,7 +8,7 @@ import (
 type ComponentGoal struct {
 	GoalValue   float64
 	XPercOffset float64
-	Perc    float64
+	Perc        float64
 }
 
 func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
@@ -26,7 +26,7 @@ func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
 	return &ComponentGoal{
 		GoalValue:   Round(goal, 2),
 		XPercOffset: Round(textOffset, 2),
-		Perc:    Round(perc*100, 2),
+		Perc:        Round(perc*100, 2),
 	}
 }
 
@@ -42,16 +42,20 @@ type PageFund struct {
 	Goal *ComponentGoal
 }
 
-type PageFunds struct {
+type PageFundsFund struct {
+	ID string
+	Desc string
+	Title string
+	Goal *ComponentGoal
 }
 
 // Prepared pages
 var (
 	MAIN_CSS    []byte
-	PAGE_FUNDS  []byte
 	DEFAULT_PFP []byte
 
-	PAGE_FUND *template.Template
+	PAGE_FUNDS *template.Template
+	PAGE_FUND  *template.Template
 )
 
 func InitFrontend() {
@@ -64,16 +68,17 @@ func InitFrontend() {
 
 	b, err = os.ReadFile("pages/fund.html")
 	PanicIfErr(err)
-	pageFund := Template(b, map[string][]byte{
+	fundRaw := Template(b, map[string][]byte{
 		"CURRENCY":     []byte(CURRENCY),
 		"PP_CLIENT_ID": []byte(PAYPAL_CLIENT_ID),
 	})
 
-	fund, err := template.New("fund").Parse(string(pageFund))
+	PAGE_FUND, err = template.New("fund").Parse(string(fundRaw))
 	PanicIfErr(err)
 
-	PAGE_FUND = fund
+	fundsRaw, err := os.ReadFile("pages/funds.html")
+	PanicIfErr(err)
 
-	PAGE_FUNDS, err = os.ReadFile("pages/funds.html")
+	PAGE_FUNDS, err = template.New("funds").Parse(string(fundsRaw))
 	PanicIfErr(err)
 }
