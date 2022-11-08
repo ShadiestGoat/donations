@@ -19,8 +19,13 @@
     - [ ] discord oauth2
   - [ ] / (frontend stuff here)
     - [ ] / (default fund)
+      - [ ] fix the redirect (has to be a fully formed URL)
+      - [ ] Add goal support
+      - [ ] Fix the 'not you' to be 'login'
     - [ ] /funds (all funds) (?complete=true/false)
     - [ ] /funds/{id} (chosen fund)
+    - [ ] /f/{quick_name}
+    - [ ] /login (do discord login stuff)
 - [ ] Discord Bot:
   - [ ] /donate
   - [ ] /donor user:@user

@@ -1,11 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v4"
@@ -13,11 +15,11 @@ import (
 
 // Prepared pages
 var (
-	MAIN_CSS []byte
-	PAGE_FUND []byte
+	MAIN_CSS       []byte
+	PAGE_FUND      []byte
 	PAGE_GOAL_FUND []byte
-	FUNDS    []byte
-	DEFAULT_PFP []byte
+	FUNDS          []byte
+	DEFAULT_PFP    []byte
 )
 
 func InitFrontend() {
@@ -28,7 +30,7 @@ func InitFrontend() {
 	b, err = os.ReadFile("pages/fund.html")
 	PanicIfErr(err)
 	PAGE_FUND = Template(b, map[string][]byte{
-		"CURRENCY": []byte(CURRENCY),
+		"CURRENCY":     []byte(CURRENCY),
 		"PP_CLIENT_ID": []byte(PAYPAL_CLIENT_ID),
 	})
 
@@ -90,40 +92,19 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 	}
 
 	discordName := "Anonymous"
-	discordPFP  := "defaultPFP.png"
+	discordPFP := "defaultPFP.png"
 
 	if dID != "anon" {
-		req, _ := http.NewRequest("GET", "https://discord.com/api/v10/users/" + dID, nil)
-		req.Header.Set("Authorization", DISCORD_TOKEN)
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil || resp.StatusCode != 200 {
-			dID = "anon"
-		} else {
-			b, _ := io.ReadAll(resp.Body)
-			if len(b) == 0 {
-				dID = "anon"
-			} else {
-				discordUser := DiscordRespUser{}
-				err = json.Unmarshal(b, &discordUser)
-				if err != nil {
-					dID = "anon"
-				} else {
-					if discordUser.PFP != "" {
-						discordPFP = "https://cdn.discordapp.com/avatars/" + dID + "/" + discordUser.PFP + ".webp?size=256"
-					}
-					discordName = discordUser.Username
-				}
-			}
-		}
-	}	
+		dID, discordName, discordPFP = FetchDiscordUser(dID, "Bot "+DISCORD_TOKEN)
+	}
 
 	Respond(w, 200, Template(PAGE_FUND, map[string][]byte{
 		"FUND_NAME": []byte(fund.Name),
 		"FUND_DESC": []byte(fund.Description),
-		"FUND_ID": 	 []byte(fund.ID),
-		"D_NAME": 	 []byte(discordName),
-		"D_PFP": 	 []byte(discordPFP),
-		"D_ID": 	 []byte(dID),
+		"FUND_ID":   []byte(fund.ID),
+		"D_NAME":    []byte(discordName),
+		"D_PFP":     []byte(discordPFP),
+		"D_ID":      []byte(dID),
 	}))
 }
 
@@ -137,6 +118,36 @@ func RouterBase() *chi.Mux {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		FrontendFund(w, r, "default")
+	})
+
+	r.Get(`/login`, func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		if q.Get("code") == "" {
+			http.Redirect(w, r, DISCORD_OAUTH_LINK, http.StatusTemporaryRedirect)
+		}
+
+		vals := url.Values{}
+
+		vals.Set("client_id", D_CLIENT_ID)
+		vals.Set("client_secret", D_CLIENT_SECRET)
+		vals.Set("authorization_code", "authorization_code")
+		vals.Set("code", q.Get("code"))
+		vals.Set("redirect_uri", DISCORD_OAUTH_LINK)
+
+		bodyReader := strings.NewReader(vals.Encode())
+
+		req, _ := http.NewRequest(http.MethodPost, DISCORD_BASE_URL+"/oauth2/token", bodyReader)
+		req.Header.Set("Content-Type", "applications/x-www-form-urlencoded")
+
+		resp, err := http.DefaultClient.Do(req)
+
+		if err != nil || resp.StatusCode != 200 || resp.Body == nil {
+			logger.Logf(LL_ERROR, "Couldn't login user: %v")
+			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
+			return
+		}
+		b, _ := io.ReadAll(resp.Body)
+		fmt.Println(string(b))
 	})
 
 	r.Get("/defaultPFP.png", func(w http.ResponseWriter, r *http.Request) {

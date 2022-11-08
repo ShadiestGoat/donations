@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -25,11 +26,14 @@ var (
 	PAYPAL_CLIENT_ID = ""
 	DISCORD_TOKEN    = ""
 
-	// D_CLIENT_ID     = ""
-	// D_CLIENT_SECRET = ""
-	// REDIRECT_URL    = ""
+	D_CLIENT_ID     = ""
+	D_CLIENT_SECRET = ""
+	
+	PROTOCOL_HOSTNAME = ""
 
 	CURRENCY = ""
+
+	DISCORD_OAUTH_LINK = ""
 )
 
 func InitConfig() {
@@ -66,16 +70,18 @@ func InitConfig() {
 			Res: &PAYPAL_CLIENT_ID,
 			Required: true,
 		},
-
-		// TODO:
-		// "DISCORD_CLIENT_ID": {
-		// 	PanicIfNone: true,
-		// 	Res:         &D_CLIENT_ID,
-		// },
-		// "DISCORD_CLIENT_SECRET": {
-		// 	PanicIfNone: true,
-		// 	Res:         &D_CLIENT_SECRET,
-		// },
+		"DISCORD_CLIENT_ID": {
+			Required: true,
+			Res:         &D_CLIENT_ID,
+		},
+		"DISCORD_CLIENT_SECRET": {
+			Required: true,
+			Res:         &D_CLIENT_SECRET,
+		},
+		"PROTOCOL_HOSTNAME": {
+			Required:    true,
+			Res:         &PROTOCOL_HOSTNAME,
+		},
 	}
 
 	for name, opt := range confMap {
@@ -96,4 +102,6 @@ func InitConfig() {
 	} else if DEBUG_DISC_MENTION == "" {
 		logger.Logf(LL_WARN, "DEBUG_DISC_MENTION is empty! No one will be mentioned. On debug info")
 	}
+
+	DISCORD_OAUTH_LINK = "https://discord.com/api/oauth2/authorize?client_id=" + D_CLIENT_ID + "&response_type=code&scope=identify&redirect_uri=" + url.QueryEscape(PROTOCOL_HOSTNAME + "/login")
 }
