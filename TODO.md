@@ -23,9 +23,9 @@
       - [ ] Add goal support
       - [ ] Fix the 'not you' to be 'login'
     - [ ] /funds (all funds) (?complete=true/false)
-    - [ ] /funds/{id} (chosen fund)
-    - [ ] /f/{quick_name}
-    - [ ] /login (do discord login stuff)
+    - [x] /funds/{id} (chosen fund)
+    - [x] /f/{quick_name}
+    - [x] /login (do discord login stuff)
 - [ ] Discord Bot:
   - [ ] /donate
   - [ ] /donor user:@user

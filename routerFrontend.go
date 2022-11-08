@@ -102,6 +102,7 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 		"FUND_NAME": []byte(fund.Name),
 		"FUND_DESC": []byte(fund.Description),
 		"FUND_ID":   []byte(fund.ID),
+		"CURRENCY":  []byte(CURRENCY),
 		"D_NAME":    []byte(discordName),
 		"D_PFP":     []byte(discordPFP),
 		"D_ID":      []byte(dID),
@@ -118,6 +119,30 @@ func RouterBase() *chi.Mux {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		FrontendFund(w, r, "default")
+	})
+
+	r.Get("/funds", func(w http.ResponseWriter, r *http.Request) {
+		// FrontendFund(w, r, "default")
+		// TODO:
+	})
+
+	r.Get(`/f/{quickName}`, func(w http.ResponseWriter, r *http.Request) {
+		id := ""
+		err := DBQueryRow(`SELECT id FROM funds WHERE quick_name = $1`, chi.URLParam(r, "quickName")).Scan(&id)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				http.Redirect(w, r, "/error?err=404%20Not%20Found", http.StatusTemporaryRedirect)
+			} else {
+				logger.Logf(LL_ERROR, "Couldn't fetch: %v", err)
+				http.Redirect(w, r, "/error?err=Unknown%20Error", http.StatusTemporaryRedirect)
+			}
+			return
+		}
+		FrontendFund(w, r, id)
+	})
+
+	r.Get("/funds/{fundID}", func(w http.ResponseWriter, r *http.Request) {
+		FrontendFund(w, r, chi.URLParam(r, "fundID"))
 	})
 
 	r.Get(`/login`, func(w http.ResponseWriter, r *http.Request) {
