@@ -19,10 +19,10 @@ func main() {
 
 	InitDB()
 	logger.Logf(LL_DEBUG, "Database connected!")
-	
+
 	r := RouterBase()
 	r.Mount(`/api`, RouterAPI())
 
 	logger.Logf(LL_DEBUG, "Server started!")
-	PanicIfErr(http.ListenAndServe(":" + PORT, r))
+	PanicIfErr(http.ListenAndServe(":"+PORT, r))
 }

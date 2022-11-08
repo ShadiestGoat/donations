@@ -135,7 +135,7 @@ func RouterBase() *chi.Mux {
 		vals.Set("code", q.Get("code"))
 		vals.Set("redirect_uri", DISCORD_OAUTH_REDIRECT)
 
-		resp, err := http.PostForm(DISCORD_BASE_URL + "/oauth2/token", vals)
+		resp, err := http.PostForm(DISCORD_BASE_URL+"/oauth2/token", vals)
 
 		if err != nil || resp.StatusCode != 200 || resp.Body == nil {
 			if err == nil && resp.Body != nil {
@@ -146,10 +146,10 @@ func RouterBase() *chi.Mux {
 			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
 			return
 		}
-		
+
 		auth := &DiscordOAuth2{}
 		b, _ := io.ReadAll(resp.Body)
-		
+
 		err = json.Unmarshal(b, auth)
 
 		if err != nil {
@@ -158,7 +158,7 @@ func RouterBase() *chi.Mux {
 			return
 		}
 
-		dID, _, _ := FetchDiscordUser("@me", "Bearer " + auth.Token)
+		dID, _, _ := FetchDiscordUser("@me", "Bearer "+auth.Token)
 
 		fund := q.Get("fund")
 

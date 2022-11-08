@@ -11,13 +11,13 @@ import (
 )
 
 type Fund struct {
-	ID string          `json:"id,omitempty"`
-	Default *bool      `json:"default,omitempty"`
-	Goal float64       `json:"goal,omitempty"`
-	Name string        `json:"name"`
-	Title string       `json:"title"`
-	Description string `json:"description"`
-	Amount *float64 `json:"amount,omitempty"`
+	ID          string   `json:"id,omitempty"`
+	Default     *bool    `json:"default,omitempty"`
+	Goal        float64  `json:"goal,omitempty"`
+	Name        string   `json:"name"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Amount      *float64 `json:"amount,omitempty"`
 }
 
 type ContextKeys int
@@ -33,14 +33,14 @@ func (f *Fund) PopulateAmount() {
 }
 
 func FundMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request)  {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fundID := chi.URLParam(r, "fundID")
 		if fundID == "" {
 			RespondErr(w, ErrNotFound)
 			return
 		}
 		fund := &Fund{
-			ID:          fundID,
+			ID: fundID,
 		}
 		var err error
 		if fundID == "default" {
@@ -117,9 +117,7 @@ func RouterFunds() http.Handler {
 		rows, _ := DBQuery(q, args...)
 
 		for rows.Next() {
-			fund := &Fund{
-				
-			}
+			fund := &Fund{}
 			rows.Scan(&fund.ID, &fund.Default, &fund.Goal, &fund.Name, &fund.Title, &fund.Description)
 			funds = append(funds, fund)
 		}
@@ -128,7 +126,9 @@ func RouterFunds() http.Handler {
 
 	// Create a new fund
 	r.Post(`/`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {return}
+		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {
+			return
+		}
 		fund := &Fund{}
 		if ParseJSON(w, r, fund) {
 			return
@@ -169,16 +169,18 @@ func RouterFundsID() http.Handler {
 		fund.PopulateAmount()
 		RespondJSON(w, 200, fund)
 	})
-	
+
 	// Replace a fund's settings (except default)
 	r.Put(`/`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {return}
+		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {
+			return
+		}
 		fund := &Fund{}
 
 		if ParseJSON(w, r, fund) {
 			return
 		}
-		
+
 		DBExec(`UPDATE funds SET goal = $1, quick_name = $2, title = $3, description = $4 WHERE id = $5`,
 			fund.Goal,
 			fund.Name,
@@ -191,7 +193,9 @@ func RouterFundsID() http.Handler {
 	})
 
 	r.Post(`/default`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {return}
+		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {
+			return
+		}
 		fund := r.Context().Value(CTX_FUND).(*Fund)
 		if *fund.Default {
 			RespondJSON(w, 200, fund)

@@ -15,20 +15,20 @@ type confItem struct {
 }
 
 var (
-	DB_URI             = ""
-	PORT               = ""
-	
+	DB_URI = ""
+	PORT   = ""
+
 	DEBUG_DISC_WEBHOOK = ""
 	DEBUG_DISC_MENTION = ""
 
-	PAYPAL_PATH        = ""
+	PAYPAL_PATH = ""
 
 	PAYPAL_CLIENT_ID = ""
 	DISCORD_TOKEN    = ""
 
 	D_CLIENT_ID     = ""
 	D_CLIENT_SECRET = ""
-	
+
 	PROTOCOL_HOSTNAME = ""
 
 	CURRENCY = ""
@@ -51,38 +51,38 @@ func InitConfig() {
 			Default: "3000",
 		},
 		"PAYPAL_PATH": {
-			Res:     &PAYPAL_PATH,
+			Res:      &PAYPAL_PATH,
 			Required: true,
 		},
 		"DEBUG_DISC_WEBHOOK": {
-			Res:      &DEBUG_DISC_WEBHOOK,
+			Res: &DEBUG_DISC_WEBHOOK,
 		},
 		"DEBUG_DISC_MENTION": {
-			Res:      &DEBUG_DISC_MENTION,
+			Res: &DEBUG_DISC_MENTION,
 		},
 		"CURRENCY": {
 			Res:     &CURRENCY,
 			Default: "EUR",
 		},
 		"DISCORD_TOKEN": {
-			Res: &DISCORD_TOKEN,
+			Res:      &DISCORD_TOKEN,
 			Required: true,
 		},
 		"PAYPAL_CLIENT_ID": {
-			Res: &PAYPAL_CLIENT_ID,
+			Res:      &PAYPAL_CLIENT_ID,
 			Required: true,
 		},
 		"DISCORD_CLIENT_ID": {
 			Required: true,
-			Res:         &D_CLIENT_ID,
+			Res:      &D_CLIENT_ID,
 		},
 		"DISCORD_CLIENT_SECRET": {
 			Required: true,
-			Res:         &D_CLIENT_SECRET,
+			Res:      &D_CLIENT_SECRET,
 		},
 		"PROTOCOL_HOSTNAME": {
-			Required:    true,
-			Res:         &PROTOCOL_HOSTNAME,
+			Required: true,
+			Res:      &PROTOCOL_HOSTNAME,
 		},
 	}
 

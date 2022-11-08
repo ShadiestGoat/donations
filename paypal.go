@@ -19,9 +19,9 @@ type Resource struct {
 }
 
 type PurchaseUnit struct {
-	Description string     `json:"description"`
-	Payments    *Payment   `json:"payments"`
-	Items       []*Item    `json:"items"`
+	Description string   `json:"description"`
+	Payments    *Payment `json:"payments"`
+	Items       []*Item  `json:"items"`
 }
 
 type Item struct {
@@ -92,7 +92,7 @@ func (e PPEventRaw) Parse() *PPDonation {
 		return nil
 	}
 	capture := unit.Payments.Captures[0]
-	
+
 	spl := strings.Split(unit.Items[0].Name, "-")
 	count := 0
 

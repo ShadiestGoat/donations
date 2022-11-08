@@ -23,7 +23,9 @@ var upgrader = websocket.Upgrader{
 }
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
-	if NoPermHTTP(w, r, PERM_LIVE_NOTIFICATION) {return}
+	if NoPermHTTP(w, r, PERM_LIVE_NOTIFICATION) {
+		return
+	}
 	app := Apps[r.Header.Get("Authorization")]
 
 	if _, ok := WSMgr.Connections[app.Token]; ok {
@@ -34,7 +36,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
-		Respond(w, 501, []byte(`{"error": "` + err.Error() + `"}`))
+		Respond(w, 501, []byte(`{"error": "`+err.Error()+`"}`))
 		return
 	}
 
@@ -63,9 +65,9 @@ func (e WSR_NewDon) WSEvent() WSEvent {
 }
 
 type WSEvent struct {
-	Type EventType `json:"event"`
+	Type EventType       `json:"event"`
 	Body json.RawMessage `json:"body"`
-	Perm Permission `json:"-"`
+	Perm Permission      `json:"-"`
 }
 
 type WSMgrT struct {

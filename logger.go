@@ -81,7 +81,7 @@ func (l Logger) Logf(level LogLevel, msg string, args ...any) {
 		content = strings.ReplaceAll(content, `"`, `\"`)
 
 		buf := []byte(`{"content":"` + content + `"}`)
-		
+
 		http.Post(DEBUG_DISC_WEBHOOK, "application/json", bytes.NewReader(buf))
 	}
 	if level == LL_PANIC {

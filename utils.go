@@ -132,7 +132,7 @@ func NewCycle() int {
 
 func Template(inp []byte, variables map[string][]byte) []byte {
 	for varName, val := range variables {
-		inp = bytes.ReplaceAll(inp, []byte("{{%" + varName + "}}"), val)
+		inp = bytes.ReplaceAll(inp, []byte("{{%"+varName+"}}"), val)
 	}
 	return inp
 }

@@ -20,13 +20,13 @@ type Donor struct {
 }
 
 type Donation struct {
-	DonationID string `json:"donationID"`
-	OrderID string `json:"ppOrderID"`
-	CaptureID string `json:"ppCaptureID"`
-	Donor string `json:"donor"`
-	Message string `json:"message"`
-	Amount float64 `json:"amount"`
-	FundID string `json:"fundID"`
+	DonationID string  `json:"donationID"`
+	OrderID    string  `json:"ppOrderID"`
+	CaptureID  string  `json:"ppCaptureID"`
+	Donor      string  `json:"donor"`
+	Message    string  `json:"message"`
+	Amount     float64 `json:"amount"`
+	FundID     string  `json:"fundID"`
 }
 
 type ProfileResponse struct {
@@ -88,10 +88,10 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1`, id).Scan(&total)
 		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1 AND donation_id >= $2`, id, TimeToSnow(cycle)).Scan(&monthly)
 		return &ProfileResponse{
-			Donors:    []*Donor{
+			Donors: []*Donor{
 				donor,
 			},
-			Total:     &DonorInfo{
+			Total: &DonorInfo{
 				Total: total,
 				Month: monthly,
 			},
@@ -101,7 +101,7 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 }
 
 func FetchProfileByX(columnName string, id string, resolve bool) *ProfileResponse {
-	rows, _ := DBQuery(`SELECT donor FROM donors WHERE ` + columnName + ` = $1`, id)
+	rows, _ := DBQuery(`SELECT donor FROM donors WHERE `+columnName+` = $1`, id)
 	resp := &ProfileResponse{
 		Donors:    []*Donor{},
 		Total:     &DonorInfo{},

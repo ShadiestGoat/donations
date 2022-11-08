@@ -64,7 +64,7 @@ func InitAuths() {
 
 	header := ">"
 
-	for i := 0; i < largestName + 10; i++ {
+	for i := 0; i < largestName+10; i++ {
 		header += "="
 	}
 

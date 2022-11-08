@@ -29,7 +29,6 @@ CONSTRAINT is_fund
 		REFERENCES funds(id)
 )`
 
-
 const SQL_SETUP_DONORS = `CREATE TABLE IF NOT EXISTS donors (
 id          TEXT PRIMARY KEY,
 discord_id  TEXT,
@@ -61,16 +60,15 @@ func InitDB() {
 
 	DB = db
 
-	
 	_, err = DBExec(SQL_SETUP_DONORS)
 	PanicIfErr(err)
 
 	_, err = DBExec(SQL_SETUP_FUNDS)
 	PanicIfErr(err)
-	
+
 	_, err = DBExec(SQL_SETUP_DONATIONS)
 	PanicIfErr(err)
-	
+
 }
 
 func DBExec(sql string, args ...interface{}) (pgconn.CommandTag, error) {
