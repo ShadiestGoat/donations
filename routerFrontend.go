@@ -1,13 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v4"
@@ -135,12 +135,7 @@ func RouterBase() *chi.Mux {
 		vals.Set("code", q.Get("code"))
 		vals.Set("redirect_uri", DISCORD_OAUTH_LINK)
 
-		bodyReader := strings.NewReader(vals.Encode())
-
-		req, _ := http.NewRequest(http.MethodPost, DISCORD_BASE_URL+"/oauth2/token", bodyReader)
-		req.Header.Set("Content-Type", "applications/x-www-form-urlencoded")
-
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := http.PostForm(DISCORD_BASE_URL + "/oauth2/token", vals)
 
 		if err != nil || resp.StatusCode != 200 || resp.Body == nil {
 			if err == nil && resp.Body != nil {
@@ -151,9 +146,31 @@ func RouterBase() *chi.Mux {
 			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
 			return
 		}
-
+		
+		auth := &DiscordOAuth2{}
 		b, _ := io.ReadAll(resp.Body)
-		fmt.Println(string(b))
+		
+		err = json.Unmarshal(b, auth)
+
+		if err != nil {
+			logger.Logf(LL_ERROR, "Couldn't login user: %v\n%v", err, string(b))
+			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
+			return
+		}
+
+		dID, _, _ := FetchDiscordUser("@me", "Bearer " + auth.Token)
+
+		fund := q.Get("fund")
+
+		red := "/"
+
+		if fund != "" {
+			red = "/funds/" + fund
+		}
+
+		red += "?id=" + dID
+
+		http.Redirect(w, r, red, http.StatusTemporaryRedirect)
 	})
 
 	r.Get("/defaultPFP.png", func(w http.ResponseWriter, r *http.Request) {

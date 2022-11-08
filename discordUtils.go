@@ -34,6 +34,7 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 					pfp = "https://cdn.discordapp.com/avatars/" + id + "/" + discordUser.PFP + ".webp?size=256"
 				}
 				name = discordUser.Username
+				oID = discordUser.ID
 			}
 		}
 	}
@@ -44,10 +45,6 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 	return
 }
 
-type OAUth2 struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	GrantType    string `json:"authorization_code"`
-	Code         string `json:"code"`
-	RedirectURI  string `json:"redirect_uri"`
+type DiscordOAuth2 struct {
+	Token string `json:"token"`
 }
