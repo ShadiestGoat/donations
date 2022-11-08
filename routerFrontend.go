@@ -101,6 +101,7 @@ func RouterBase() *chi.Mux {
 	r.Get("/funds", func(w http.ResponseWriter, r *http.Request) {
 		// FrontendFund(w, r, "default")
 		// TODO:
+		Respond(w, 200, PAGE_FUNDS)
 	})
 
 	r.Get(`/f/{quickName}`, func(w http.ResponseWriter, r *http.Request) {

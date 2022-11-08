@@ -8,13 +8,16 @@
     <meta content="Donate for '{{ .FundName }}'" property="og:title" />
     <meta content="{{ .FundDesc }}" property="og:description" />
 
+    <link media="all" rel="stylesheet" href="/main.css" />
+    
     <link
       href="https://fonts.googleapis.com/css?family=Roboto"
       rel="stylesheet"
     />
-    <link media="all" rel="stylesheet" href="/main.css" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
       .pfp {
@@ -235,7 +238,25 @@
       <h1 class="fund-desc">{{ .FundDesc }}</h1>
 
       {{if .Goal}}
-        {{ template "compGoal" .Goal }}
+        <div class="goal">
+          <h3 class="goal-txt">0</h3>
+      
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width: 45vw;height: 100%;" viewBox="0 0 120 24">
+              <pattern id="diagonalHatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="translate(0)">
+                  <animateTransform attributeType="xml"
+                      attributeName="patternTransform"
+                      type="translate" from="0" to="30" begin="0"
+                      dur="15s" repeatCount="indefinite"/>
+                  <rect width="100%" height="100%" fill="#6e6bee"></rect>
+                  <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:#3F3D92; stroke-width:1.5" />
+              </pattern>
+              <rect width="{{ .Goal.Perc }}" x="0" rx="8" height="16" y="4" stroke-width="1" stroke="#fff00000" fill="url(#diagonalHatch)"></rect>
+              <rect width="100%" x="0" rx="8" height="16" y="4" stroke-width="1" stroke="#fff" fill="none"></rect>
+              <text x="{{ .Goal.XPercOffset }}%" y="50%" fill="#fff" font-family="sans-serif" font-size="9" dominant-baseline="middle" text-anchor="middle">{{ .Goal.Perc }}%</text>
+          </svg>
+      
+          <h3 class="goal-txt">{{ .Goal.GoalValue }}</h3>
+        </div>
       {{ end }}
 
       <div class="amount-wrapper">

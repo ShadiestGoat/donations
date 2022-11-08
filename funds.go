@@ -75,6 +75,47 @@ func FundMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func FetchFunds(before, after string, complete *bool) []*Fund {
+	q := `SELECT id,def,goal,quick_name,title,description FROM funds`
+	args := []any{}
+	checks := []string{}
+	if before != "" {
+		checks = append(checks, "id <= ")
+		args = append(args, before)
+	}
+	if after != "" {
+		checks = append(checks, "id >= ")
+		args = append(args, after)
+	}
+	if complete != nil {
+		checks = append(checks, "complete = ")
+		args = append(args, *complete)
+	}
+	if len(checks) != 0 {
+		q += " WHERE"
+	}
+
+	for argIndex, check := range checks {
+		if argIndex != 0 {
+			q += " AND "
+		}
+		q += check + "$" + fmt.Sprint(argIndex+1)
+	}
+
+	q += ` ORDER BY id DESC LIMIT 50`
+
+	funds := []*Fund{}
+	rows, _ := DBQuery(q, args...)
+
+	for rows.Next() {
+		fund := &Fund{}
+		rows.Scan(&fund.ID, &fund.Default, &fund.Goal, &fund.Name, &fund.Title, &fund.Description)
+		funds = append(funds, fund)
+	}
+
+	return funds
+}
+
 func RouterFunds() http.Handler {
 	r := chi.NewRouter()
 
@@ -83,45 +124,16 @@ func RouterFunds() http.Handler {
 	r.Get(`/`, func(w http.ResponseWriter, r *http.Request) {
 		before := r.URL.Query().Get("before")
 		after := r.URL.Query().Get("after")
-		complete := r.URL.Query().Get("complete")
-		q := `SELECT id,def,goal,quick_name,title,description FROM funds`
-		args := []any{}
-		checks := []string{}
-		if before != "" {
-			checks = append(checks, "id <= ")
-			args = append(args, before)
-		}
-		if after != "" {
-			checks = append(checks, "id >= ")
-			args = append(args, after)
-		}
-		if complete != "" {
-			checks = append(checks, "complete = ")
-			args = append(args, complete == "true" || complete == "t")
+		completeRaw := r.URL.Query().Get("complete")
+
+		var complete *bool
+
+		if completeRaw != "" {
+			val := completeRaw == "t" || completeRaw == "true"
+			complete = &val
 		}
 
-		if len(checks) != 0 {
-			q += " WHERE"
-		}
-
-		for argIndex, check := range checks {
-			if argIndex != 0 {
-				q += " AND "
-			}
-			q += check + "$" + fmt.Sprint(argIndex+1)
-		}
-
-		q += ` ORDER BY id DESC LIMIT 50`
-
-		funds := []*Fund{}
-		rows, _ := DBQuery(q, args...)
-
-		for rows.Next() {
-			fund := &Fund{}
-			rows.Scan(&fund.ID, &fund.Default, &fund.Goal, &fund.Name, &fund.Title, &fund.Description)
-			funds = append(funds, fund)
-		}
-		RespondJSON(w, 200, funds)
+		RespondJSON(w, 200, FetchFunds(before, after, complete))
 	})
 
 	// Create a new fund
