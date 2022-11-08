@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -19,9 +20,11 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 	req.Header.Set("Authorization", token)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil || resp.StatusCode != 200 {
+		fmt.Println("????")
 		oID = "anon"
 	} else {
 		b, _ := io.ReadAll(resp.Body)
+		fmt.Println(string(b))
 		if len(b) == 0 {
 			oID = "anon"
 		} else {
