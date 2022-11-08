@@ -149,5 +149,5 @@ func Template(inp []byte, variables map[string][]byte) []byte {
 
 func Round(val float64, decimals int) float64 {
 	vDiv := math.Pow10(decimals)
-	return math.Round(val*vDiv)/vDiv
+	return math.Round(val*vDiv) / vDiv
 }
