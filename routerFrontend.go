@@ -124,6 +124,7 @@ func RouterBase() *chi.Mux {
 		q := r.URL.Query()
 		if q.Get("code") == "" {
 			http.Redirect(w, r, DISCORD_OAUTH_LINK, http.StatusTemporaryRedirect)
+			return
 		}
 
 		vals := url.Values{}
