@@ -96,7 +96,7 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 	}
 
 	discordName := "Anonymous"
-	discordPFP := "defaultPFP.png"
+	discordPFP := "/defaultPFP.png"
 
 	if dID != "anon" {
 		dID, discordName, discordPFP = FetchDiscordUser(dID, "Bot "+DISCORD_TOKEN)

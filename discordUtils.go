@@ -45,7 +45,7 @@ func FetchDiscordUser(id string, token string) (oID string, name string, pfp str
 	}
 	if oID == "anon" {
 		name = "Anonymous"
-		pfp = "defaultPFP.png"
+		pfp = "/defaultPFP.png"
 	}
 	return
 }
