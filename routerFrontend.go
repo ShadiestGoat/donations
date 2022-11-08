@@ -7,44 +7,10 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v4"
 )
-
-// Prepared pages
-var (
-	MAIN_CSS       []byte
-	PAGE_FUND      []byte
-	GOAL_COMPONENT []byte
-	FUNDS          []byte
-	DEFAULT_PFP    []byte
-
-	GOAL_COMPONENT_WIDTH = 118.0
-)
-
-func InitFrontend() {
-	b, err := os.ReadFile("pages/main.css")
-	PanicIfErr(err)
-	MAIN_CSS = b
-
-	b, err = os.ReadFile("pages/fund.html")
-	PanicIfErr(err)
-	PAGE_FUND = Template(b, map[string][]byte{
-		"CURRENCY":     []byte(CURRENCY),
-		"PP_CLIENT_ID": []byte(PAYPAL_CLIENT_ID),
-	})
-
-	b, err = os.ReadFile("pages/compGoal.html")
-	PanicIfErr(err)
-	GOAL_COMPONENT = Template(b, map[string][]byte{
-		"GOAL_WIDTH": []byte(fmt.Sprint(GOAL_COMPONENT_WIDTH)),
-	})
-
-	DEFAULT_PFP, err = os.ReadFile("pages/defaultPFP.png")
-	PanicIfErr(err)
-}
 
 func FrontendError(w http.ResponseWriter, r *http.Request, err string) {
 	http.Redirect(w, r, "/error?err="+url.QueryEscape(err), http.StatusTemporaryRedirect)
@@ -102,43 +68,19 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 		dID, discordName, discordPFP = FetchDiscordUser(dID, "Bot "+DISCORD_TOKEN)
 	}
 
-	goalComp := []byte{}
-
 	if fund.Goal != 0 {
 		fund.PopulateAmount()
-
-		perc := *fund.Amount / fund.Goal
-		width := perc * GOAL_COMPONENT_WIDTH
-
-		if perc > 1 {
-			width = GOAL_COMPONENT_WIDTH
-		}
-
-		textXOffset := perc * 50 // perc * 100 / 2
-
-		if perc > 1 || perc < 0.25 {
-			textXOffset = 50
-		}
-
-		text := fmt.Sprintf(`<text x="%.2f%%" y="50%%" fill="#fff" font-family="sans-serif" font-size="9" dominant-baseline="middle" text-anchor="middle">%.0f%%</text>`, textXOffset, perc*100)
-
-		goalComp = Template(GOAL_COMPONENT, map[string][]byte{
-			"WIDTH":    []byte(fmt.Sprintf(`%.2f`, width)),
-			"TEXT_SVG": []byte(text),
-			"GOAL_MAX": []byte(fmt.Sprint(fund.Goal)),
-		})
 	}
 
-	Respond(w, 200, Template(PAGE_FUND, map[string][]byte{
-		"FUND_NAME": []byte(fund.Name),
-		"FUND_DESC": []byte(fund.Description),
-		"FUND_ID":   []byte(fund.ID),
-		"CURRENCY":  []byte(CURRENCY),
-		"D_NAME":    []byte(discordName),
-		"D_PFP":     []byte(discordPFP),
-		"D_ID":      []byte(dID),
-		"GOAL_COMP": goalComp,
-	}))
+	FrontendRespond(w, r, PAGE_FUND, "fund", PageFund{
+		DiscordPFP:  discordPFP,
+		DiscordName: discordName,
+		DiscordID:   dID,
+		FundID:      fundID,
+		FundDesc:    fund.Description,
+		FundName:    fund.Name,
+		Goal:        NewComponentGoal(fund.Goal, *fund.Amount),
+	})
 }
 
 func RouterBase() *chi.Mux {

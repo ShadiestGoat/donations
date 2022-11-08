@@ -5,8 +5,8 @@
     <meta name="author" content="Shady Goat" />
     <title>Donations</title>
 
-    <meta content="Donate for '{{%FUND_NAME}}'" property="og:title" />
-    <meta content="{{%FUND_DESC}}" property="og:description" />
+    <meta content="Donate for '{{ .FundName }}'" property="og:title" />
+    <meta content="{{ .FundDesc }}" property="og:description" />
 
     <link
       href="https://fonts.googleapis.com/css?family=Roboto"
@@ -221,20 +221,22 @@
     <div class="container">
       <div class="welcome-msg">
         <div class="left">
-          <img class="pfp" src="{{%D_PFP}}">
+          <img class="pfp" src="{{ .DiscordPFP }}">
         </div>
         <div class="mid"></div>
         <div class="right">
-          <h2 class="name"><i>{{%D_NAME}}</i></h2>
+          <h2 class="name"><i>{{ .DiscordName }}</i></h2>
         </div>
       </div>
       <div class="not-you-wrapper">
-        <h4 class="not-you"><a id="not-you" href="/login?fund={{%FUND_ID}}">(not you?)</a></h4>
+        <h4 class="not-you"><a id="not-you" href="/login">(not you?)</a></h4>
       </div>
 
-      <h1 class="fund-desc">{{%FUND_DESC}}</h1>
+      <h1 class="fund-desc">{{ .FundDesc }}</h1>
 
-      {{%GOAL_COMP}}
+      {{if .Goal}}
+        {{ template "compGoal" .Goal }}
+      {{end}}
 
       <div class="amount-wrapper">
         <input id="amount" step="0.5" type="number" value="2.5" min="2" max="100"  />
@@ -264,7 +266,7 @@
       const amtElem = document.getElementById("amount")
       const errMsgElem = document.getElementById("msg-err")
       const errAmtElem = document.getElementById("amt-err")
-      const discordID = `{{%D_ID}}`
+      const discordID = `{{ .DiscordID }}`
       
       if (!discordID) {
         document.getElementById("not-you").innerHTML = "(Wish to login?)"
@@ -354,7 +356,7 @@
             },
             items: [
               {
-                name: "{{%D_ID}}-{{%FUND_ID}}",
+                name: "{{ .DiscordID }}-{{ .FundID }}",
                 unit_amount: {
                   currency_code: "{{%CURRENCY}}",
                   value: 1,
@@ -414,7 +416,7 @@
             
             onApprove: function (data, actions) {
               return actions.order.capture().then(function (orderData) {
-                actions.redirect('/thanks?fund={{%FUND_ID}}')
+                actions.redirect('/thanks?fund={{ .FundID }}')
               });
             },
 

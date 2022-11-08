@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
+	"math"
 	"math/rand"
 	"net/http"
 	"time"
@@ -83,6 +85,14 @@ func Respond(w http.ResponseWriter, status int, msg []byte) {
 	w.Write(msg)
 }
 
+func FrontendRespond(w http.ResponseWriter, r *http.Request, Page *template.Template, templateName string, data any) {
+	w.WriteHeader(200)
+	err := Page.ExecuteTemplate(w, templateName, data)
+	if err != nil {
+		FrontendError(w, r, "Can't load page")
+	}
+}
+
 func RespondJSON(w http.ResponseWriter, status int, val any) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(val)
@@ -135,4 +145,9 @@ func Template(inp []byte, variables map[string][]byte) []byte {
 		inp = bytes.ReplaceAll(inp, []byte("{{%"+varName+"}}"), val)
 	}
 	return inp
+}
+
+func Round(val float64, decimals int) float64 {
+	vDiv := math.Pow10(decimals)
+	return math.Round(val*vDiv)/vDiv
 }
