@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -88,6 +89,10 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 
 func RouterBase() *chi.Mux {
 	r := chi.NewRouter()
+
+	r.Use(middleware.StripSlashes)
+	r.Use(middleware.CleanPath)
+	r.Use(middleware.Recoverer)
 
 	r.Get("/main.css", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/css")
