@@ -89,6 +89,8 @@ func FrontendRespond(w http.ResponseWriter, r *http.Request, Page *template.Temp
 	w.WriteHeader(200)
 	err := Page.ExecuteTemplate(w, templateName, data)
 	if err != nil {
+		out, _ := json.Marshal(data)
+		logger.Logf(LL_ERROR, "Couldn't exec template '%v' with data '%v': %v", templateName, out, err)
 		FrontendError(w, r, "Can't load page")
 	}
 }
