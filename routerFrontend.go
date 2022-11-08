@@ -38,19 +38,17 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 
 	var err error
 	if fundID == "default" {
-		err = DBQueryRow(`SELECT id, goal, quick_name, title, description FROM funds WHERE def = 'true'`).Scan(
+		err = DBQueryRow(`SELECT id, goal, short_title, description FROM funds WHERE def = 'true'`).Scan(
 			&fund.ID,
 			&fund.Goal,
-			&fund.Name,
+			&fund.ShortTitle,
 			&fund.Title,
-			&fund.Description,
 		)
 	} else {
-		err = DBQueryRow(`SELECT goal, quick_name, title, description FROM funds WHERE id = $1`, fundID).Scan(
+		err = DBQueryRow(`SELECT goal, short_title, description FROM funds WHERE id = $1`, fundID).Scan(
 			&fund.Goal,
-			&fund.Name,
+			&fund.ShortTitle,
 			&fund.Title,
-			&fund.Description,
 		)
 	}
 
@@ -77,13 +75,13 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 	}
 
 	FrontendRespond(w, r, PAGE_FUND, "fund", PageFund{
-		DiscordPFP:  discordPFP,
-		DiscordName: discordName,
-		DiscordID:   dID,
-		FundID:      fundID,
-		FundDesc:    fund.Description,
-		FundName:    fund.Name,
-		Goal:        goalComp,
+		DiscordPFP:     discordPFP,
+		DiscordName:    discordName,
+		DiscordID:      dID,
+		FundID:         fundID,
+		FundTitle:      fund.Title,
+		FundShortTitle: fund.ShortTitle,
+		Goal:           goalComp,
 	})
 }
 
@@ -104,13 +102,13 @@ func RouterBase() *chi.Mux {
 	})
 
 	r.Get("/funds", func(w http.ResponseWriter, r *http.Request) {
-		rows, _ := DBQuery(`SELECT id,goal,title,description,def FROM funds WHERE complete = 'false' order by id LIMIT 50`)
+		rows, _ := DBQuery(`SELECT id,goal,short_title,description,def FROM funds WHERE complete = 'false' order by id LIMIT 50`)
 		funds := []*PageFundsFund{}
 		for rows.Next() {
 			goal := 0.0
 			def := false
 			frontendFund := &PageFundsFund{}
-			rows.Scan(&frontendFund.ID, &goal, &frontendFund.Title, &frontendFund.Desc, &def)
+			rows.Scan(&frontendFund.ID, &goal, &frontendFund.ShortTitle, &frontendFund.Title, &def)
 			if goal != 0 {
 				fund := &Fund{
 					ID: frontendFund.ID,
@@ -129,7 +127,7 @@ func RouterBase() *chi.Mux {
 
 	r.Get(`/f/{quickName}`, func(w http.ResponseWriter, r *http.Request) {
 		id := ""
-		err := DBQueryRow(`SELECT id FROM funds WHERE quick_name = $1`, chi.URLParam(r, "quickName")).Scan(&id)
+		err := DBQueryRow(`SELECT id FROM funds WHERE alias = $1`, chi.URLParam(r, "quickName")).Scan(&id)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
 				FrontendError(w, r, "404 Not Found")

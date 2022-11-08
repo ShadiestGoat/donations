@@ -24,7 +24,7 @@
       - [ ] Fix the 'not you' to be 'login'
     - [ ] /funds (all funds) (?complete=true/false)
     - [x] /funds/{id} (chosen fund)
-    - [x] /f/{quick_name}
+    - [x] /f/{alias}
     - [x] /login (do discord login stuff)
 - [ ] Discord Bot:
   - [ ] /donate

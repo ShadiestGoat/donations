@@ -11,13 +11,13 @@ import (
 )
 
 type Fund struct {
-	ID          string   `json:"id,omitempty"`
-	Default     *bool    `json:"default,omitempty"`
-	Goal        float64  `json:"goal,omitempty"`
-	Name        string   `json:"name"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Amount      *float64 `json:"amount,omitempty"`
+	ID         string   `json:"id,omitempty"`
+	Default    *bool    `json:"default,omitempty"`
+	Goal       float64  `json:"goal,omitempty"`
+	Alias      string   `json:"alias"`
+	ShortTitle string   `json:"shortTitle"`
+	Title      string   `json:"title"`
+	Amount     *float64 `json:"amount,omitempty"`
 }
 
 type ContextKeys int
@@ -44,22 +44,22 @@ func FundMiddleware(next http.Handler) http.Handler {
 		}
 		var err error
 		if fundID == "default" {
-			err = DBQueryRow(`SELECT id, goal, quick_name, title, description FROM funds WHERE def = 'true'`).Scan(
+			err = DBQueryRow(`SELECT id, goal, alias, short_title, description FROM funds WHERE def = 'true'`).Scan(
 				&fund.ID,
 				&fund.Goal,
-				&fund.Name,
+				&fund.Alias,
+				&fund.ShortTitle,
 				&fund.Title,
-				&fund.Description,
 			)
 			def := true
 			fund.Default = &def
 		} else {
-			err = DBQueryRow(`SELECT def, goal, quick_name, title, description FROM funds WHERE id = $1`, fundID).Scan(
+			err = DBQueryRow(`SELECT def, goal, alias, short_title, description FROM funds WHERE id = $1`, fundID).Scan(
 				&fund.Default,
 				&fund.Goal,
-				&fund.Name,
+				&fund.Alias,
+				&fund.ShortTitle,
 				&fund.Title,
-				&fund.Description,
 			)
 		}
 
@@ -76,7 +76,7 @@ func FundMiddleware(next http.Handler) http.Handler {
 }
 
 func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund {
-	q := `SELECT id,def,goal,quick_name,title,description FROM funds`
+	q := `SELECT id,def,goal,alias,short_title,description FROM funds`
 	args := []any{}
 	checks := []string{}
 	if before != "" {
@@ -109,7 +109,7 @@ func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund
 
 	for rows.Next() {
 		fund := &Fund{}
-		rows.Scan(&fund.ID, &fund.Default, &fund.Goal, &fund.Name, &fund.Title, &fund.Description)
+		rows.Scan(&fund.ID, &fund.Default, &fund.Goal, &fund.Alias, &fund.ShortTitle, &fund.Title)
 		if fetchAmounts {
 			fund.PopulateAmount()
 		}
@@ -158,13 +158,13 @@ func RouterFunds() http.Handler {
 		if *fund.Default {
 			DBExec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
 		}
-		DBExec(`INSERT INTO funds (id, def, goal, quick_name, title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
+		DBExec(`INSERT INTO funds (id, def, goal, alias, short_title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
 			fund.ID,
 			fund.Default,
 			fund.Goal,
-			fund.Name,
+			fund.Alias,
+			fund.ShortTitle,
 			fund.Title,
-			fund.Description,
 		)
 		RespondJSON(w, 200, fund)
 	})
@@ -197,11 +197,11 @@ func RouterFundsID() http.Handler {
 			return
 		}
 
-		DBExec(`UPDATE funds SET goal = $1, quick_name = $2, title = $3, description = $4 WHERE id = $5`,
+		DBExec(`UPDATE funds SET goal = $1, alias = $2, short_title = $3, description = $4 WHERE id = $5`,
 			fund.Goal,
-			fund.Name,
+			fund.Alias,
+			fund.ShortTitle,
 			fund.Title,
-			fund.Description,
 			fund.ID,
 		)
 

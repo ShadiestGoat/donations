@@ -43,8 +43,9 @@ id TEXT PRIMARY KEY,
 def BOOLEAN DEFAULT false,
 goal NUMERIC(9, 2) DEFAULT 0,
 complete BOOLEAN DEFAULT false,
-quick_name TEXT DEFAULT '',
-title TEXT DEFAULT '',
+
+alias TEXT DEFAULT '',
+short_title TEXT DEFAULT '',
 description TEXT DEFAULT ''
 )`
 

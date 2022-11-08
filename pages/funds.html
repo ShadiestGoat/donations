@@ -70,7 +70,7 @@
         {{range .}}
           <a href="/funds/{{ .ID }}">
 
-            <h2>{{ .Title }}</h2>
+            <h2>{{ .ShortTitle }}</h2>
 
             {{if .Goal}}
               <div class="goal">
@@ -91,7 +91,7 @@
             {{end}}
 
             <div class="desc">
-              <p>{{ .Desc }}</p>
+              <p>{{ .Title }}</p>
             </div>
           </a>
         {{end}}

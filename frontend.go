@@ -35,18 +35,18 @@ type PageFund struct {
 	DiscordName string
 	DiscordID   string
 
-	FundID   string
-	FundDesc string
-	FundName string
+	FundID         string
+	FundTitle      string
+	FundShortTitle string
 
 	Goal *ComponentGoal
 }
 
 type PageFundsFund struct {
-	ID    string
-	Desc  string
-	Title string
-	Goal  *ComponentGoal
+	ID         string
+	Title      string
+	ShortTitle string
+	Goal       *ComponentGoal
 }
 
 // Prepared pages
