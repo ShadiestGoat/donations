@@ -43,10 +43,10 @@ type PageFund struct {
 }
 
 type PageFundsFund struct {
-	ID string
-	Desc string
+	ID    string
+	Desc  string
 	Title string
-	Goal *ComponentGoal
+	Goal  *ComponentGoal
 }
 
 // Prepared pages
