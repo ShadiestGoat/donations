@@ -105,15 +105,9 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 	goalComp := []byte{}
 
 	if fund.Goal != 0 {
-		total := 0.0
-		err := DBQueryRow(`SELECT SUM(amount_received) AS total FROM donations`).Scan(&total)
-		if err != nil {
-			logger.Logf(LL_ERROR, "Bad goal fetch: %v", err)
-			http.Redirect(w, r, "/error?err=Unknown%20Error", http.StatusTemporaryRedirect)
-			return
-		}
+		fund.PopulateAmount()
 
-		perc := total / fund.Goal
+		perc := *fund.Amount / fund.Goal
 		width := perc * GOAL_COMPONENT_WIDTH
 
 		if perc > 1 {

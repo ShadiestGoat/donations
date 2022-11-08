@@ -168,6 +168,18 @@ func RouterAPI() http.Handler {
 			return
 		}
 
+		fundGoal := 0.0
+
+		DBQueryRow(`SELECT goal FROM funds WHERE id = $1`, donation.FundID).Scan(&fundGoal)
+
+		if fundGoal != 0 {
+			f := Fund{ID: donation.FundID}
+			f.PopulateAmount()
+			if *f.Amount >= fundGoal {
+				DBExec(`UPDATE funds SET complete = 'true' WHERE id = $1`, donation.FundID)
+			}
+		}
+
 		logger.Logf(LL_SUCCESS, "Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
 		RespondSuccess(w)
 		WSMgr.SendEvent(WSR_NewDon{
