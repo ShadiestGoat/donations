@@ -133,7 +133,7 @@ func RouterBase() *chi.Mux {
 		vals.Set("client_secret", D_CLIENT_SECRET)
 		vals.Set("grant_type", "authorization_code")
 		vals.Set("code", q.Get("code"))
-		vals.Set("redirect_uri", DISCORD_OAUTH_LINK)
+		vals.Set("redirect_uri", DISCORD_OAUTH_REDIRECT)
 
 		resp, err := http.PostForm(DISCORD_BASE_URL + "/oauth2/token", vals)
 
