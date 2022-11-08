@@ -47,7 +47,7 @@ func InitFrontend() {
 }
 
 func FrontendError(w http.ResponseWriter, r *http.Request, err string) {
-	http.Redirect(w, r, "/error?err="+err, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/error?err="+url.QueryEscape(err), http.StatusTemporaryRedirect)
 }
 
 func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
@@ -114,7 +114,7 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 			width = GOAL_COMPONENT_WIDTH
 		}
 
-		textXOffset := perc * 100
+		textXOffset := perc * 50 // perc * 100 / 2
 
 		if perc > 1 || perc < 0.25 {
 			textXOffset = 50
@@ -163,10 +163,10 @@ func RouterBase() *chi.Mux {
 		err := DBQueryRow(`SELECT id FROM funds WHERE quick_name = $1`, chi.URLParam(r, "quickName")).Scan(&id)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				http.Redirect(w, r, "/error?err=404%20Not%20Found", http.StatusTemporaryRedirect)
+				FrontendError(w, r, "404 Not Found")
 			} else {
 				logger.Logf(LL_ERROR, "Couldn't fetch: %v", err)
-				http.Redirect(w, r, "/error?err=Unknown%20Error", http.StatusTemporaryRedirect)
+				FrontendError(w, r, "Unknown Error")
 			}
 			return
 		}
@@ -200,7 +200,7 @@ func RouterBase() *chi.Mux {
 				fmt.Println(resp.StatusCode, string(b))
 			}
 			logger.Logf(LL_ERROR, "Couldn't login user!")
-			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
+			FrontendError(w, r, "Unknown Error")
 			return
 		}
 
@@ -211,7 +211,7 @@ func RouterBase() *chi.Mux {
 
 		if err != nil {
 			logger.Logf(LL_ERROR, "Couldn't login user: %v\n%v", err, string(b))
-			http.Redirect(w, r, "/error?err=Unknown%20Error!", http.StatusTemporaryRedirect)
+			FrontendError(w, r, "Unknown Error")
 			return
 		}
 
