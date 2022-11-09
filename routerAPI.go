@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+// Handles authentication & responses.
 // Returns true if the request's app doesn't have the perm for this route
 func NoPermHTTP(w http.ResponseWriter, r *http.Request, perm Permission) bool {
 	token := r.Header.Get("Authorization")
@@ -89,6 +90,9 @@ func RouterAPI() http.Handler {
 	r.HandleFunc("/ws", socketHandler)
 
 	r.Get(`/donations`, func(w http.ResponseWriter, r *http.Request) {
+		if NoPermHTTP(w, r, PERM_FETCH_DONATIONS) {
+			return
+		}
 		before := r.URL.Query().Get("before")
 		after := r.URL.Query().Get("after")
 
@@ -124,7 +128,7 @@ func RouterAPI() http.Handler {
 			rows.Scan(&don.ID, &don.Donor, &don.Amount, &don.Message, &don.FundID)
 			donos = append(donos, don)
 		}
-		
+
 		RespondJSON(w, 200, donos)
 	})
 

@@ -20,6 +20,8 @@ const (
 	PERM_LIVE_NOTIFICATION
 	// Admin fund control
 	PERM_FUND_CONTROL
+	// Fetch from /donations
+	PERM_FETCH_DONATIONS
 )
 
 type App struct {
