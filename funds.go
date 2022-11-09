@@ -167,6 +167,9 @@ func RouterFunds() http.Handler {
 			fund.Title,
 		)
 		RespondJSON(w, 200, fund)
+		WSMgr.SendEvent(WSR_NewFund{
+			Fund: fund,
+		}.WSEvent())
 	})
 
 	r.Mount(`/{fundID}`, RouterFundsID())

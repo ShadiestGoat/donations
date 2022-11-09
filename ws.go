@@ -60,7 +60,18 @@ func (e WSR_NewDon) WSEvent() WSEvent {
 	return WSEvent{
 		Type: ET_NEW_DON,
 		Body: b,
-		Perm: 0,
+	}
+}
+
+type WSR_NewFund struct {
+	*Fund
+}
+
+func (e WSR_NewFund) WSEvent() WSEvent {
+	b, _ := json.Marshal(e)
+	return WSEvent{
+		Type: ET_NEW_FUND,
+		Body: b,
 	}
 }
 
