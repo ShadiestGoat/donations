@@ -11,7 +11,7 @@ import (
 var DB *pgxpool.Pool
 
 const SQL_SETUP_DONATIONS = `CREATE TABLE IF NOT EXISTS donations (
-donation_id     TEXT PRIMARY KEY,
+id     TEXT PRIMARY KEY,
 order_id        TEXT UNIQUE,
 capture_id      TEXT UNIQUE,
 donor           TEXT,

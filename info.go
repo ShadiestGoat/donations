@@ -20,13 +20,13 @@ type Donor struct {
 }
 
 type Donation struct {
-	DonationID string  `json:"donationID"`
-	OrderID    string  `json:"ppOrderID"`
-	CaptureID  string  `json:"ppCaptureID"`
-	Donor      string  `json:"donor"`
-	Message    string  `json:"message"`
-	Amount     float64 `json:"amount"`
-	FundID     string  `json:"fundID"`
+	ID        string  `json:"id"`
+	OrderID   string  `json:"ppOrderID"`
+	CaptureID string  `json:"ppCaptureID"`
+	Donor     string  `json:"donor"`
+	Message   string  `json:"message"`
+	Amount    float64 `json:"amount"`
+	FundID    string  `json:"fundID"`
 }
 
 type ProfileResponse struct {
@@ -60,7 +60,7 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 	cycle := PayCycle(donor.CycleDay, now)
 
 	if resolve {
-		rows, _ := DBQuery(`SELECT donation_id, order_id, capture_id, amount, message, fund FROM donations WHERE donor = $1`, id)
+		rows, _ := DBQuery(`SELECT id, order_id, capture_id, amount, message, fund FROM donations WHERE donor = $1`, id)
 		donations := []*Donation{}
 		total := &DonorInfo{
 			Total: 0,
@@ -70,9 +70,9 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 			donation := &Donation{
 				Donor: id,
 			}
-			rows.Scan(&donation.DonationID, &donation.OrderID, &donation.CaptureID, &donation.Amount, &donation.Message, &donation.FundID)
+			rows.Scan(&donation.ID, &donation.OrderID, &donation.CaptureID, &donation.Amount, &donation.Message, &donation.FundID)
 			total.Total += donation.Amount
-			donationTime := SnowToTime(donation.DonationID)
+			donationTime := SnowToTime(donation.ID)
 			if donationTime.Unix() > cycle.Unix() {
 				total.Month += donation.Amount
 			}
@@ -86,7 +86,7 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 	} else {
 		total, monthly := 0.0, 0.0
 		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1`, id).Scan(&total)
-		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1 AND donation_id >= $2`, id, TimeToSnow(cycle)).Scan(&monthly)
+		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1 AND id >= $2`, id, TimeToSnow(cycle)).Scan(&monthly)
 		return &ProfileResponse{
 			Donors: []*Donor{
 				donor,

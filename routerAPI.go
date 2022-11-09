@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -87,6 +88,46 @@ func RouterAPI() http.Handler {
 
 	r.HandleFunc("/ws", socketHandler)
 
+	r.Get(`/donations`, func(w http.ResponseWriter, r *http.Request) {
+		before := r.URL.Query().Get("before")
+		after := r.URL.Query().Get("after")
+
+		q := `SELECT id,donor,amount,message,fund FROM donations`
+		args := []any{}
+		checks := []string{}
+		if before != "" {
+			checks = append(checks, "id <= ")
+			args = append(args, before)
+		}
+		if after != "" {
+			checks = append(checks, "id >= ")
+			args = append(args, after)
+		}
+		if len(checks) != 0 {
+			q += " WHERE"
+		}
+
+		for argIndex, check := range checks {
+			if argIndex != 0 {
+				q += " AND "
+			}
+			q += check + "$" + fmt.Sprint(argIndex+1)
+		}
+
+		q += ` ORDER BY id DESC LIMIT 50`
+
+		donos := []*Donation{}
+		rows, _ := DBQuery(q, args...)
+
+		for rows.Next() {
+			don := &Donation{}
+			rows.Scan(&don.ID, &don.Donor, &don.Amount, &don.Message, &don.FundID)
+			donos = append(donos, don)
+		}
+		
+		RespondJSON(w, 200, donos)
+	})
+
 	r.Post("/"+PAYPAL_PATH, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rawPayPal := &PPEventRaw{}
 		if r.Body == nil {
@@ -151,7 +192,7 @@ func RouterAPI() http.Handler {
 
 			lastMonthDonos := 0
 
-			DBQueryRow(`SELECT COUNT(*) FROM donations WHERE payer = $1 AND donation_id BETWEEN $2 AND $3`, donorID, minID, maxID).Scan(&lastMonthDonos)
+			DBQueryRow(`SELECT COUNT(*) FROM donations WHERE payer = $1 AND id BETWEEN $2 AND $3`, donorID, minID, maxID).Scan(&lastMonthDonos)
 
 			if lastMonthDonos == 0 {
 				DBExec(`UPDATE payers SET cycle = $1 WHERE id = $2`, NewCycle(), donorID)
@@ -161,7 +202,7 @@ func RouterAPI() http.Handler {
 		amount, _ := strconv.ParseFloat(donation.AmountDonated.Value, 64)
 		amountReceived, _ := strconv.ParseFloat(donation.AmountReceived.Value, 64)
 
-		_, err = DBExec("INSERT INTO donations(donation_id, order_id, capture_id, donor, amount, amount_received, message, fund) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", donationID, donation.OrderID, donation.CaptureID, donorID, amount, amountReceived, donation.Description, donation.FundID)
+		_, err = DBExec("INSERT INTO donations(id, order_id, capture_id, donor, amount, amount_received, message, fund) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", donationID, donation.OrderID, donation.CaptureID, donorID, amount, amountReceived, donation.Description, donation.FundID)
 
 		if err != nil {
 			RespondErr(w, ErrServerBad)
@@ -184,13 +225,13 @@ func RouterAPI() http.Handler {
 		RespondSuccess(w)
 		WSMgr.SendEvent(WSR_NewDon{
 			Donation: &Donation{
-				DonationID: donationID,
-				OrderID:    donation.OrderID,
-				CaptureID:  donation.CaptureID,
-				Donor:      donorID,
-				Message:    donation.Description,
-				Amount:     amount,
-				FundID:     donation.FundID,
+				ID:        donationID,
+				OrderID:   donation.OrderID,
+				CaptureID: donation.CaptureID,
+				Donor:     donorID,
+				Message:   donation.Description,
+				Amount:    amount,
+				FundID:    donation.FundID,
 			},
 		}.WSEvent())
 	}))
