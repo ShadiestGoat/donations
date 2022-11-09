@@ -187,6 +187,10 @@ func RouterBase() *chi.Mux {
 		http.Redirect(w, r, "/?id"+dID, http.StatusTemporaryRedirect)
 	})
 
+	r.Get("/error", func(w http.ResponseWriter, r *http.Request) {
+		Respond(w, 200, PAGE_ERROR)
+	})
+
 	r.Get("/defaultPFP.png", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/png")
 		Respond(w, 200, DEFAULT_PFP)
