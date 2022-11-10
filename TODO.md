@@ -1,6 +1,6 @@
-- [ ] WS
-  - [ ] New Don
-  - [ ] New Fund
+- [x] WS
+  - [x] New Don
+  - [x] New Fund
 - [ ] HTTP
   - [ ] /api
     - [x] /donors
@@ -16,13 +16,13 @@
         - [x] PUT /
         - [x] POST /default
     - [x] POST /CUSTOM-PAYPAL-ENDPOINT
-    - [ ] discord oauth2
+    - [x] discord oauth2
   - [ ] / (frontend stuff here)
     - [ ] / (default fund)
       - [ ] fix the redirect (has to be a fully formed URL)
-      - [ ] Add goal support
-      - [ ] Fix the 'not you' to be 'login'
-    - [ ] /funds (all funds) (?complete=true/false)
+      - [x] Add goal support
+      - [x] Fix the 'not you' to be 'login'
+    - [x] /funds (all funds) (?complete=true/false)
     - [x] /funds/{id} (chosen fund)
     - [x] /f/{alias}
     - [x] /login (do discord login stuff)
