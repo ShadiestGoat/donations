@@ -49,6 +49,7 @@ const (
 	ET_NONE EventType = iota
 	ET_NEW_DON
 	ET_NEW_FUND
+	ET_PING
 )
 
 type WSR_NewDon struct {
@@ -130,6 +131,18 @@ func (mgr *WSMgrT) PingLoop() {
 	}
 }
 
+var (
+	// Using a custom ping allows browsers to connect
+	WS_PING *websocket.PreparedMessage
+)
+
+func init() {
+	b, _ := json.Marshal(WSEvent{
+		Type: ET_PING,
+	})
+	WS_PING, _ = websocket.NewPreparedMessage(1, b)
+}
+
 func (mgr *WSMgrT) Ping() {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
@@ -140,21 +153,14 @@ func (mgr *WSMgrT) Ping() {
 		wg.Add(1)
 
 		go func(id string, c *websocket.Conn) {
-			pong := make(chan bool)
-			c.SetPongHandler(func(appData string) error {
-				pong <- true
-				return nil
-			})
+			c.WritePreparedMessage(WS_PING)		
+			c.SetReadDeadline(time.Now().Add(5 * time.Second))
+			_, p, err := c.ReadMessage()
 
-			c.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
-			c.SetReadDeadline(time.Now().Add(10 * time.Second))
-			timer := time.NewTimer(10 * time.Second)
-			go c.ReadMessage()
-
-			select {
-			case <-timer.C:
-				go mgr.Remove(id, "Ping fail")
-			case <-pong:
+			if err != nil || len(p) == 0 || p[0] != 'P' {
+				go mgr.Remove(id, "Ping fail!")
+			} else {
+				c.SetReadDeadline(time.Time{})
 			}
 			wg.Done()
 		}(id, c)
