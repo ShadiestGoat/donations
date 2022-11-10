@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -150,7 +151,7 @@ func (mgr *WSMgrT) Ping() {
 			case <-timer.C:
 				go mgr.Remove(id)
 			case <-pong:
-
+				fmt.Println("pong")
 			}
 			wg.Done()
 		}(id, c)
