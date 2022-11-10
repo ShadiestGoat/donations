@@ -158,6 +158,7 @@ func RouterFunds() http.Handler {
 		if *fund.Default {
 			DBExec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
 		}
+
 		DBExec(`INSERT INTO funds (id, def, goal, alias, short_title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
 			fund.ID,
 			fund.Default,
