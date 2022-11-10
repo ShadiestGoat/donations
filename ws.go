@@ -146,11 +146,11 @@ func (mgr *WSMgrT) Ping() {
 			})
 
 			c.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
-			timer := time.NewTimer(10 * time.Second)
+			// timer := time.NewTimer(10 * time.Second)
 
 			select {
-			case <-timer.C:
-				go mgr.Remove(id)
+			// case <-timer.C:
+			// 	go mgr.Remove(id)
 			case <-pong:
 				fmt.Println("pong")
 			}
