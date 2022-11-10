@@ -96,11 +96,6 @@ var WSMgr = &WSMgrT{
 func (mgr *WSMgrT) Add(token string, conn *websocket.Conn) {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
-	
-	conn.SetPongHandler(func(appData string) error {
-		fmt.Println("!!!")
-		return nil
-	})
 
 	mgr.Connections[token] = conn
 }
@@ -140,38 +135,27 @@ func (mgr *WSMgrT) Ping() {
 	defer mgr.Lock.Unlock()
 
 	wg := &sync.WaitGroup{}
-	
-	fmt.Println("Ping?")
-
-	
 
 	for id, c := range mgr.Connections {
 		wg.Add(1)
 
 		go func(id string, c *websocket.Conn) {
-			// pong := make(chan bool)
-			// c.SetPongHandler(func(appData string) error {
-			// 	fmt.Println("????????")
-			// 	pong <- true
-			// 	return nil
-			// })
-
-			// c.SetPingHandler(func(appData string) error {
-			// 	fmt.Println("???")
-			// 	return nil
-			// })
+			pong := make(chan bool)
+			c.SetPongHandler(func(appData string) error {
+				pong <- true
+				return nil
+			})
 
 			c.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
-			// timer := time.NewTimer(10 * time.Second)
+			c.SetReadDeadline(time.Now().Add(10 * time.Second))
+			timer := time.NewTimer(10 * time.Second)
+			go c.ReadMessage()
 
-			// select {
-			// // case <-timer.C:
-			// // 	go mgr.Remove(id)
-			// case <-pong:
-			// 	fmt.Println("pong")
-			// }
-			for {
-
+			select {
+			case <-timer.C:
+				go mgr.Remove(id)
+			case <-pong:
+				fmt.Println("pong")
 			}
 			wg.Done()
 		}(id, c)
