@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -39,7 +38,6 @@ type ProfileResponse struct {
 // Return ProfileResponse based on DonorID
 // if resolve is true, ProfileResponse.Donations is populated.
 func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
-	fmt.Println(id)
 	donor := &Donor{
 		ID: id,
 	}
@@ -103,7 +101,7 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 }
 
 func FetchProfileByX(columnName string, id string, resolve bool) *ProfileResponse {
-	rows, _ := DBQuery(`SELECT donor FROM donors WHERE `+columnName+` = $1`, id)
+	rows, _ := DBQuery(`SELECT id FROM donors WHERE `+columnName+` = $1`, id)
 	resp := &ProfileResponse{
 		Donors:    []*Donor{},
 		Total:     &DonorInfo{},
