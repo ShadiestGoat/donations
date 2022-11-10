@@ -157,7 +157,7 @@ func (mgr *WSMgrT) Ping() {
 			c.SetReadDeadline(time.Now().Add(5 * time.Second))
 			_, p, err := c.ReadMessage()
 
-			if err != nil || len(p) == 0 || p[0] != 'P' {
+			if err != nil || len(p) != 1 || p[0] != 'P' {
 				go mgr.Remove(id, "Ping fail!")
 			} else {
 				c.SetReadDeadline(time.Time{})
