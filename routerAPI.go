@@ -133,7 +133,7 @@ func RouterAPI() http.Handler {
 		}
 		err := json.Unmarshal(b, &rawPayPal)
 		if err != nil {
-			logger.Logf(LL_WARN, "An illegal paypal event has been received!\n-> |"+string(b)+"| <-")
+			logger.Logf(LL_WARN, "An illegal paypal event has been received!\n-> |"+string(b)+"| <-: " + err.Error())
 			RespondErr(w, ErrBadBody)
 			return
 		}
