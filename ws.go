@@ -96,6 +96,12 @@ var WSMgr = &WSMgrT{
 func (mgr *WSMgrT) Add(token string, conn *websocket.Conn) {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
+	
+	conn.SetPongHandler(func(appData string) error {
+		fmt.Println("!!!")
+		return nil
+	})
+
 	mgr.Connections[token] = conn
 }
 
@@ -141,11 +147,6 @@ func (mgr *WSMgrT) Ping() {
 
 	for id, c := range mgr.Connections {
 		wg.Add(1)
-		
-		c.SetPongHandler(func(appData string) error {
-			fmt.Println("!!!")
-			return nil
-		})
 
 		go func(id string, c *websocket.Conn) {
 			// pong := make(chan bool)
