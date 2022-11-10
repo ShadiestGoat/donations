@@ -92,7 +92,7 @@ func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund
 		args = append(args, *complete)
 	}
 	if len(checks) != 0 {
-		q += " WHERE"
+		q += " WHERE "
 	}
 
 	for argIndex, check := range checks {
@@ -103,8 +103,6 @@ func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund
 	}
 
 	q += ` ORDER BY id DESC LIMIT 50`
-
-	fmt.Println(q, args)
 
 	funds := []*Fund{}
 	rows, _ := DBQuery(q, args...)
