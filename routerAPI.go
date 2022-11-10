@@ -41,10 +41,6 @@ func RouterDonors() http.Handler {
 	r.Get(`/discord/{discordID}`, func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
 		out := FetchProfileByDiscord(chi.URLParam(r, `discordID`), q.Get("resolve") == "true")
-		if len(out.Donors) == 0 {
-			RespondErr(w, ErrNotFound)
-			return
-		}
 		enc, _ := json.Marshal(out)
 		Respond(w, 200, enc)
 	})
@@ -52,10 +48,6 @@ func RouterDonors() http.Handler {
 	r.Get(`/donor/{donorID}`, func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
 		out := FetchProfileByDonor(chi.URLParam(r, `donorID`), q.Get("resolve") == "true")
-		if len(out.Donors) == 0 {
-			RespondErr(w, ErrNotFound)
-			return
-		}
 		enc, _ := json.Marshal(out)
 		Respond(w, 200, enc)
 	})
@@ -63,10 +55,6 @@ func RouterDonors() http.Handler {
 	r.Get(`/paypal/{paypalID}`, func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
 		out := FetchProfileByPaypal(chi.URLParam(r, `paypalID`), q.Get("resolve") == "true")
-		if len(out.Donors) == 0 {
-			RespondErr(w, ErrNotFound)
-			return
-		}
 		enc, _ := json.Marshal(out)
 		Respond(w, 200, enc)
 	})
