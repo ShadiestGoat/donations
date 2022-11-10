@@ -44,7 +44,7 @@ def BOOLEAN DEFAULT false,
 goal NUMERIC(9, 2) DEFAULT 0,
 complete BOOLEAN DEFAULT false,
 
-alias TEXT DEFAULT '',
+alias TEXT UNIQUE NOT NULL,
 short_title TEXT DEFAULT '',
 description TEXT DEFAULT ''
 )`

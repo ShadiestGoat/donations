@@ -22,12 +22,13 @@ func (h HTTPError) Error() string {
 }
 
 var (
-	ErrNotFound      = &HTTPError{Status: 404, Err: "notFound"}
-	ErrBadBody       = &HTTPError{Status: 400, Err: "badBody"}
-	ErrDoubleAccess  = &HTTPError{Status: 400, Err: "doubleAccess"}
-	ErrNoUser        = &HTTPError{Status: 400, Err: "UserNotFound"}
-	ErrNotAuthorized = &HTTPError{Status: 401, Err: "notAuthorized"}
-	ErrServerBad     = &HTTPError{Status: 500, Err: "serverBad"}
+	ErrNotFound       = &HTTPError{Status: 404, Err: "notFound"}
+	ErrBadBody        = &HTTPError{Status: 400, Err: "badBody"}
+	ErrDoubleAccess   = &HTTPError{Status: 400, Err: "doubleAccess"}
+	ErrNoUser         = &HTTPError{Status: 400, Err: "UserNotFound"}
+	ErrNotAuthorized  = &HTTPError{Status: 401, Err: "notAuthorized"}
+	ErrServerBad      = &HTTPError{Status: 500, Err: "serverBad"}
+	ErrNotUniqueAlias = &HTTPError{Status: 400, Err: "notUniqueAlias"}
 	// ErrNoPollLeft = &HTTPError{Status: 200, Err: "noPollLeft"}
 	// ErrBodyMissing = &HTTPError{Status: 400, Err: "bodyMissing"}
 	// ErrRateLimit = &HTTPError{Status: 429, Err: "rateLimit"}
@@ -39,17 +40,13 @@ var (
 
 func init() {
 	allErrors := []*HTTPError{
-		// ErrNotFound,
+		ErrNotFound,
 		ErrBadBody,
-		// ErrBadLength,
-		// ErrProfanity,
-		// ErrBodyMissing,
-		// ErrRateLimit,
-		// ErrOAuth2Code,
-		// ErrBadEmail,
-		// ErrBadLimit,
+		ErrDoubleAccess,
+		ErrNoUser,
 		ErrNotAuthorized,
-		// ErrBanned,
+		ErrServerBad,
+		ErrNotUniqueAlias,
 	}
 	for _, err := range allErrors {
 		err.CachedMsg = []byte(fmt.Sprintf(`{"error":"%v"}`, err.Err))

@@ -155,6 +155,20 @@ func RouterFunds() http.Handler {
 		}
 		fund.ID = SnowNode.Generate().String()
 
+		if fund.Alias == "" || fund.ShortTitle == "" || fund.Title == "" {
+			RespondErr(w, ErrBadBody)
+			return
+		}
+
+		aliasCount := 0
+
+		DBQueryRow(`SELECT COUNT(*) FROM funds WHERE alias = $1`, fund.Alias).Scan(&aliasCount)
+
+		if aliasCount != 0 {
+			RespondErr(w, ErrNotUniqueAlias)
+			return
+		}
+
 		if *fund.Default {
 			DBExec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
 		}
