@@ -150,6 +150,7 @@ func (mgr *WSMgrT) Ping() {
 
 			select {
 			case <-timer.C:
+				fmt.Println(id)
 				go mgr.Remove(id)
 			case <-pong:
 
