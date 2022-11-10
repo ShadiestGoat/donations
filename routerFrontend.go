@@ -78,7 +78,7 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 		DiscordPFP:     discordPFP,
 		DiscordName:    discordName,
 		DiscordID:      dID,
-		FundID:         fundID,
+		FundID:         fund.ID,
 		FundTitle:      fund.Title,
 		FundShortTitle: fund.ShortTitle,
 		Goal:           goalComp,
