@@ -147,6 +147,11 @@ func (mgr *WSMgrT) Ping() {
 				return nil
 			})
 
+			c.SetPingHandler(func(appData string) error {
+				fmt.Println("???")
+				return nil
+			})
+
 			c.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
 			// timer := time.NewTimer(10 * time.Second)
 
