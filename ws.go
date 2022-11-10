@@ -99,9 +99,10 @@ func (mgr *WSMgrT) Add(token string, conn *websocket.Conn) {
 	mgr.Connections[token] = conn
 }
 
-func (mgr *WSMgrT) Remove(token string) {
+func (mgr *WSMgrT) Remove(token string, reason string) {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
+	logger.Logf(LL_DEBUG, "Closing WS Connection for '%v': %v", Apps[token].Name, reason)
 	conn := mgr.Connections[token]
 	conn.WriteControl(websocket.CloseMessage, []byte{}, time.Time{})
 	conn.Close()
@@ -152,7 +153,7 @@ func (mgr *WSMgrT) Ping() {
 
 			select {
 			case <-timer.C:
-				go mgr.Remove(id)
+				go mgr.Remove(id, "Ping fail")
 			case <-pong:
 			}
 			wg.Done()
