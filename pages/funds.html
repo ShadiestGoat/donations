@@ -74,7 +74,7 @@
 
             {{if .Goal}}
               <div class="goal">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width: 100%;height: 100%;" viewBox="0 0 120 24">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="width: 100%;height: 100%; max-height: 8.75vw;" viewBox="0 0 120 24">
                   <pattern id="diagonalHatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="translate(0)">
                       <animateTransform attributeType="xml"
                           attributeName="patternTransform"
@@ -83,7 +83,7 @@
                       <rect width="100%" height="100%" fill="#6e6bee"></rect>
                       <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:#3F3D92; stroke-width:1.5" />
                   </pattern>
-                  <rect width="{{ .Goal.Perc }}" x="0" rx="8" height="16" y="4" stroke-width="1" stroke="#fff00000" fill="url(#diagonalHatch)"></rect>
+                  <rect width="{{ .Goal.Width }}" x="0" rx="8" height="16" y="4" stroke-width="1" stroke="#fff00000" fill="url(#diagonalHatch)"></rect>
                   <rect width="100%" x="0" rx="8" height="16" y="4" stroke-width="1" stroke="#fff" fill="none"></rect>
                   <text x="{{ .Goal.XPercOffset }}%" y="50%" fill="#fff" font-family="sans-serif" font-size="9" dominant-baseline="middle" text-anchor="middle">{{ .Goal.Perc }}%</text>
                 </svg>

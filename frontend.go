@@ -9,6 +9,7 @@ type ComponentGoal struct {
 	GoalValue   float64
 	XPercOffset float64
 	Perc        float64
+	Width       float64
 }
 
 func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
@@ -23,10 +24,19 @@ func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
 		textOffset = 50
 	}
 
+	width := perc
+
+	if perc < 0.12 {
+		width = 0.12
+	} else if perc > 1 {
+		width = 1
+	}
+
 	return &ComponentGoal{
 		GoalValue:   Round(goal, 2),
 		XPercOffset: Round(textOffset, 2),
 		Perc:        Round(perc*100, 0),
+		Width:       Round(width * 100, 1),
 	}
 }
 
