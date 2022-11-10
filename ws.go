@@ -144,7 +144,7 @@ func (mgr *WSMgrT) Ping() {
 			})
 
 			c.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
-			timer := time.NewTimer(5 * time.Second)
+			timer := time.NewTimer(10 * time.Second)
 
 			select {
 			case <-timer.C:
