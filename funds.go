@@ -104,6 +104,8 @@ func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund
 
 	q += ` ORDER BY id DESC LIMIT 50`
 
+	fmt.Println(q, args)
+
 	funds := []*Fund{}
 	rows, _ := DBQuery(q, args...)
 
