@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -38,6 +39,7 @@ type ProfileResponse struct {
 // Return ProfileResponse based on DonorID
 // if resolve is true, ProfileResponse.Donations is populated.
 func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
+	fmt.Println(id)
 	donor := &Donor{
 		ID: id,
 	}
