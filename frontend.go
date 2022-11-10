@@ -26,7 +26,7 @@ func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
 
 	width := perc
 
-	if perc < 0.12 {
+	if perc < 0.12 && perc != 0 {
 		width = 0.12
 	} else if perc > 1 {
 		width = 1
