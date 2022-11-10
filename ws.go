@@ -140,6 +140,7 @@ func (mgr *WSMgrT) Ping() {
 		go func(id string, c *websocket.Conn) {
 			pong := make(chan bool)
 			c.SetPongHandler(func(appData string) error {
+				fmt.Println("????????")
 				pong <- true
 				return nil
 			})
