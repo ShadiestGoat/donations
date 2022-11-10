@@ -134,6 +134,8 @@ func (mgr *WSMgrT) Ping() {
 	defer mgr.Lock.Unlock()
 
 	wg := &sync.WaitGroup{}
+	
+	fmt.Println("Ping?")
 
 	for id, c := range mgr.Connections {
 		wg.Add(1)
