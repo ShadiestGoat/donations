@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -125,7 +124,6 @@ func (mgr *WSMgrT) SendEvent(e WSEvent) {
 func (mgr *WSMgrT) PingLoop() {
 	for {
 		time.Sleep(30 * time.Second)
-		fmt.Println("Ping!")
 		mgr.Ping()
 	}
 }
@@ -150,7 +148,6 @@ func (mgr *WSMgrT) Ping() {
 
 			select {
 			case <-timer.C:
-				fmt.Println(id)
 				go mgr.Remove(id)
 			case <-pong:
 
