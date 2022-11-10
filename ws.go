@@ -137,29 +137,40 @@ func (mgr *WSMgrT) Ping() {
 	
 	fmt.Println("Ping?")
 
+	
+
 	for id, c := range mgr.Connections {
 		wg.Add(1)
-		go func(id string, c *websocket.Conn) {
-			pong := make(chan bool)
-			c.SetPongHandler(func(appData string) error {
-				fmt.Println("????????")
-				pong <- true
-				return nil
-			})
+		
+		c.SetPongHandler(func(appData string) error {
+			fmt.Println("!!!")
+			return nil
+		})
 
-			c.SetPingHandler(func(appData string) error {
-				fmt.Println("???")
-				return nil
-			})
+		go func(id string, c *websocket.Conn) {
+			// pong := make(chan bool)
+			// c.SetPongHandler(func(appData string) error {
+			// 	fmt.Println("????????")
+			// 	pong <- true
+			// 	return nil
+			// })
+
+			// c.SetPingHandler(func(appData string) error {
+			// 	fmt.Println("???")
+			// 	return nil
+			// })
 
 			c.WriteControl(websocket.PingMessage, []byte{}, time.Time{})
 			// timer := time.NewTimer(10 * time.Second)
 
-			select {
-			// case <-timer.C:
-			// 	go mgr.Remove(id)
-			case <-pong:
-				fmt.Println("pong")
+			// select {
+			// // case <-timer.C:
+			// // 	go mgr.Remove(id)
+			// case <-pong:
+			// 	fmt.Println("pong")
+			// }
+			for {
+
 			}
 			wg.Done()
 		}(id, c)
