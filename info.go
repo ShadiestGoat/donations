@@ -60,7 +60,7 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 	cycle := PayCycle(donor.CycleDay, now)
 
 	if resolve {
-		rows, _ := DBQuery(`SELECT id, order_id, capture_id, amount, message, fund FROM donations WHERE id = $1 ORDER BY DESC`, id)
+		rows, _ := DBQuery(`SELECT id, order_id, capture_id, amount, message, fund FROM donations WHERE donor = $1 ORDER BY id DESC`, id)
 		donations := []*Donation{}
 		total := &DonorInfo{
 			Total: 0,
