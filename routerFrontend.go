@@ -190,6 +190,9 @@ func RouterBase() *chi.Mux {
 	r.Get("/error", func(w http.ResponseWriter, r *http.Request) {
 		Respond(w, 200, PAGE_ERROR)
 	})
+	r.Get("/thanks", func(w http.ResponseWriter, r *http.Request) {
+		Respond(w, 200, PAGE_THANKS)
+	})
 
 	r.Get("/defaultPFP.png", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/png")

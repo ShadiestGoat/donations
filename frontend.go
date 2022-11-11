@@ -67,6 +67,7 @@ var (
 	PAGE_FUNDS *template.Template
 	PAGE_FUND  *template.Template
 	PAGE_ERROR []byte
+	PAGE_THANKS []byte
 )
 
 func InitFrontend() {
@@ -94,5 +95,8 @@ func InitFrontend() {
 	PanicIfErr(err)
 
 	PAGE_ERROR, err = os.ReadFile("pages/error.html")
+	PanicIfErr(err)
+
+	PAGE_THANKS, err = os.ReadFile("pages/thanks.html")
 	PanicIfErr(err)
 }
