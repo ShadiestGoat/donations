@@ -438,7 +438,7 @@
             
             onApprove: function (data, actions) {
               return actions.order.capture().then(function (orderData) {
-                actions.redirect('/thanks?fund={{ .FundID }}')
+                actions.redirect(location.origin + '/thanks?fund={{ .FundID }}')
               });
             },
 
