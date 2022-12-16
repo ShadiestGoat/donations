@@ -116,19 +116,14 @@ func RandInt(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
-// Return the current paycycle
+// Return the start of the current paycycle
 func PayCycle(day int, now time.Time) time.Time {
-	curMonth := now.Month()
-	if now.Day() > day {
-		if curMonth == time.January {
-			curMonth = time.December
-		} else {
-			curMonth -= 1
-		}
-
-		return time.Date(now.Year(), curMonth, day, 0, 0, 0, 0, time.UTC)
+	cycle := now
+	if cycle.Day() < day {
+		cycle = cycle.AddDate(0, -1, 0)
 	}
-	return time.Date(now.Year(), curMonth, day, 0, 0, 0, 0, time.UTC)
+
+	return time.Date(cycle.Year(), cycle.Month(), day, 0, 0, 0, 0, time.UTC)
 }
 
 func NewCycle() int {
