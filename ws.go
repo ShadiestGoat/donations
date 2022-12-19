@@ -146,6 +146,7 @@ func init() {
 func (mgr *WSMgrT) Ping() {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
+	logger.Logf(LL_DEBUG, "Ping")
 
 	wg := &sync.WaitGroup{}
 
@@ -153,7 +154,7 @@ func (mgr *WSMgrT) Ping() {
 		wg.Add(1)
 
 		go func(id string, c *websocket.Conn) {
-			c.WritePreparedMessage(WS_PING)		
+			c.WritePreparedMessage(WS_PING)
 			c.SetReadDeadline(time.Now().Add(5 * time.Second))
 			_, p, err := c.ReadMessage()
 
