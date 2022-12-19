@@ -103,7 +103,7 @@ func (mgr *WSMgrT) Add(token string, conn *websocket.Conn) {
 func (mgr *WSMgrT) Remove(token string, reason string) {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
-	logger.Logf(LL_DEBUG, "Closing WS Connection for '%v': %v", Apps[token].Name, reason)
+	logger.Logf(LL_WARN, "Closing WS Connection for '%v': %v", Apps[token].Name, reason)
 	conn := mgr.Connections[token]
 	conn.WriteControl(websocket.CloseMessage, []byte{}, time.Time{})
 	conn.Close()
