@@ -155,7 +155,7 @@ func (mgr *WSMgrT) Ping() {
 
 		go func(id string, c *websocket.Conn) {
 			c.WritePreparedMessage(WS_PING)
-			c.SetReadDeadline(time.Now().Add(5 * time.Second))
+			c.SetReadDeadline(time.Now().Add(15 * time.Second))
 			_, p, err := c.ReadMessage()
 
 			if err != nil || len(p) != 1 || p[0] != 'P' {
