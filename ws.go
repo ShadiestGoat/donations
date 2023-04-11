@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/shadiestgoat/log"
 )
 
 var upgrader = websocket.Upgrader{
@@ -26,6 +27,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	if NoPermHTTP(w, r, PERM_LIVE_NOTIFICATION) {
 		return
 	}
+	
 	app := Apps[r.Header.Get("Authorization")]
 
 	if _, ok := WSMgr.Connections[app.Token]; ok {
@@ -103,7 +105,8 @@ func (mgr *WSMgrT) Add(token string, conn *websocket.Conn) {
 func (mgr *WSMgrT) Remove(token string, reason string) {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
-	logger.Logf(LL_WARN, "Closing WS Connection for '%v': %v", Apps[token].Name, reason)
+	log.Warn("Closing WS Connection for '%v': %v", Apps[token].Name, reason)
+	
 	conn := mgr.Connections[token]
 	conn.WriteControl(websocket.CloseMessage, []byte{}, time.Time{})
 	conn.Close()
@@ -146,7 +149,7 @@ func init() {
 func (mgr *WSMgrT) Ping() {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
-	logger.Logf(LL_DEBUG, "Ping")
+	log.Debug("Ping")
 
 	wg := &sync.WaitGroup{}
 

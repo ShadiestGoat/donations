@@ -11,6 +11,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v4"
+	"github.com/shadiestgoat/donations/db"
+	"github.com/shadiestgoat/log"
 )
 
 // Handles authentication & responses.
@@ -18,14 +20,17 @@ import (
 func NoPermHTTP(w http.ResponseWriter, r *http.Request, perm Permission) bool {
 	token := r.Header.Get("Authorization")
 	app, ok := Apps[token]
+
 	if token == "" || !ok {
 		RespondErr(w, ErrNotAuthorized)
 		return true
 	}
+
 	if HasPerm(token, perm) {
-		logger.Logf(LL_DEBUG, "[%v]: Requested '%v'", app.Name, r.URL)
+		log.Debug(`[%s]: Requested '%s`, app.Name, r.URL)
 		return false
 	}
+
 	RespondErr(w, ErrNotAuthorized)
 	return true
 }
@@ -109,7 +114,7 @@ func RouterAPI() http.Handler {
 		q += ` ORDER BY id DESC LIMIT 50`
 
 		donos := []*Donation{}
-		rows, _ := DBQuery(q, args...)
+		rows, _ := db.Query(q, args...)
 
 		for rows.Next() {
 			don := &Donation{}
@@ -132,19 +137,24 @@ func RouterAPI() http.Handler {
 			return
 		}
 		err := json.Unmarshal(b, &rawPayPal)
-		if err != nil {
-			logger.Logf(LL_WARN, "An illegal paypal event has been received!\n-> |"+string(b)+"| <-: " + err.Error())
+
+		if log.ErrorIfErr(err, "parsing paypal event") {
+			log.Error(string(b))
+
 			RespondErr(w, ErrBadBody)
 			return
 		}
 
 		donation := rawPayPal.Parse()
+
 		if donation == nil {
-			logger.Logf(LL_WARN, "An illegal paypal event has been received! (Parse)\n-> |"+string(b)+"| <-")
+			log.Error("An illegal paypal even has been received! (Parse)")
+			log.Error(string(b))
+
 			RespondErr(w, ErrBadBody)
 			return
 		} else {
-			logger.Logf(LL_DEBUG, "New Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
+			log.Success("New Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
 		}
 
 		if donation.DiscordID == "" {
@@ -154,7 +164,7 @@ func RouterAPI() http.Handler {
 
 		donorID, cycle := "", 0
 
-		err = DBQueryRow(`SELECT id, cycle FROM donors WHERE discord_id = $1 AND paypal = $2`, donation.DiscordID, donation.PayerID).Scan(&donorID, &cycle)
+		err = db.QueryRow(`SELECT id, cycle FROM donors WHERE discord_id = $1 AND paypal = $2`, []any{donation.DiscordID, donation.PayerID}, &donorID, &cycle)
 
 		newPayer := false
 
@@ -162,14 +172,14 @@ func RouterAPI() http.Handler {
 			if errors.Is(err, pgx.ErrNoRows) {
 				donorID, cycle = SnowNode.Generate().String(), NewCycle()
 				newPayer = true
-				_, err = DBExec(`INSERT INTO donors (id, discord_id, paypal, cycle) VALUES ($1, $2, $3, $4)`, donorID, donation.DiscordID, donation.PayerID, cycle)
+
+				_, err = db.Exec(`INSERT INTO donors (id, discord_id, paypal, cycle) VALUES ($1, $2, $3, $4)`, donorID, donation.DiscordID, donation.PayerID, cycle)
+
 				if err != nil {
-					logger.Logf(LL_ERROR, "Can't insert into DB: (id: %v, discord_id: %v, paypal: %v, cycle: %v): %v", donorID, donation.DiscordID, donation.PayerID, cycle, err)
 					RespondErr(w, ErrServerBad)
 					return
 				}
 			} else {
-				logger.Logf(LL_ERROR, "Bad db fetch for donors: d: %v pp: %v, err: %v", donation.DiscordID, donation.PayerID, err)
 				RespondErr(w, ErrServerBad)
 				return
 			}
@@ -184,17 +194,17 @@ func RouterAPI() http.Handler {
 
 			lastMonthDonos := 0
 
-			DBQueryRow(`SELECT COUNT(*) FROM donations WHERE payer = $1 AND id BETWEEN $2 AND $3`, donorID, minID, maxID).Scan(&lastMonthDonos)
+			db.QueryRow(`SELECT COUNT(*) FROM donations WHERE payer = $1 AND id BETWEEN $2 AND $3`, []any{donorID, minID, maxID}, &lastMonthDonos)
 
 			if lastMonthDonos == 0 {
-				DBExec(`UPDATE payers SET cycle = $1 WHERE id = $2`, NewCycle(), donorID)
+				db.Exec(`UPDATE payers SET cycle = $1 WHERE id = $2`, NewCycle(), donorID)
 			}
 		}
 
 		amount, _ := strconv.ParseFloat(donation.AmountDonated.Value, 64)
 		amountReceived, _ := strconv.ParseFloat(donation.AmountReceived.Value, 64)
 
-		_, err = DBExec("INSERT INTO donations(id, order_id, capture_id, donor, amount, amount_received, message, fund) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", donationID, donation.OrderID, donation.CaptureID, donorID, amount, amountReceived, donation.Description, donation.FundID)
+		_, err = db.Exec("INSERT INTO donations(id, order_id, capture_id, donor, amount, amount_received, message, fund) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", donationID, donation.OrderID, donation.CaptureID, donorID, amount, amountReceived, donation.Description, donation.FundID)
 
 		if err != nil {
 			RespondErr(w, ErrServerBad)
@@ -203,18 +213,20 @@ func RouterAPI() http.Handler {
 
 		fundGoal := 0.0
 
-		DBQueryRow(`SELECT goal FROM funds WHERE id = $1`, donation.FundID).Scan(&fundGoal)
+		db.QueryRowID(`SELECT goal FROM funds WHERE id = $1`, donation.FundID, &fundGoal)
 
 		if fundGoal != 0 {
 			f := Fund{ID: donation.FundID}
 			f.PopulateAmount()
 			if *f.Amount >= fundGoal {
-				DBExec(`UPDATE funds SET complete = 'true' WHERE id = $1`, donation.FundID)
+				db.Exec(`UPDATE funds SET complete = 'true' WHERE id = $1`, donation.FundID)
 			}
 		}
 
-		logger.Logf(LL_SUCCESS, "Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
+		log.Success("Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
+		
 		RespondSuccess(w)
+		
 		WSMgr.SendEvent(WSR_NewDon{
 			Donation: &Donation{
 				ID:        donationID,

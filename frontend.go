@@ -3,6 +3,8 @@ package main
 import (
 	"html/template"
 	"os"
+
+	"github.com/shadiestgoat/log"
 )
 
 type ComponentGoal struct {
@@ -72,31 +74,33 @@ var (
 
 func InitFrontend() {
 	b, err := os.ReadFile("pages/main.css")
-	PanicIfErr(err)
+	log.FatalIfErr(err, "opening 'pages/main.css'")
+
 	MAIN_CSS = b
 
 	DEFAULT_PFP, err = os.ReadFile("pages/defaultPFP.png")
-	PanicIfErr(err)
+	log.FatalIfErr(err, "opening defaultPFP.png image")
 
 	b, err = os.ReadFile("pages/fund.html")
-	PanicIfErr(err)
+	log.FatalIfErr(err, "opening 'pages/fund.html'")
+
 	fundRaw := Template(b, map[string][]byte{
 		"CURRENCY":     []byte(CURRENCY),
 		"PP_CLIENT_ID": []byte(PAYPAL_CLIENT_ID),
 	})
 
 	PAGE_FUND, err = template.New("fund").Parse(string(fundRaw))
-	PanicIfErr(err)
+	log.FatalIfErr(err, "parsing/creating the fund template")
 
 	fundsRaw, err := os.ReadFile("pages/funds.html")
-	PanicIfErr(err)
-
+	log.FatalIfErr(err, "opening the 'funds' image")
+	
 	PAGE_FUNDS, err = template.New("funds").Parse(string(fundsRaw))
-	PanicIfErr(err)
-
+	log.FatalIfErr(err, "parsing/creating the 'funds' template")
+	
 	PAGE_ERROR, err = os.ReadFile("pages/error.html")
-	PanicIfErr(err)
-
+	log.FatalIfErr(err, "opening the error page")
+	
 	PAGE_THANKS, err = os.ReadFile("pages/thanks.html")
-	PanicIfErr(err)
+	log.FatalIfErr(err, "opening the 'thanks' page")
 }

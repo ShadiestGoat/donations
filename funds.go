@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v4"
+	"github.com/shadiestgoat/donations/db"
 )
 
 type Fund struct {
@@ -28,7 +27,9 @@ const (
 
 func (f *Fund) PopulateAmount() {
 	amt := 0.0
-	DBQueryRow(`SELECT SUM(amount_received) FROM donations WHERE fund=$1`, f.ID).Scan(&amt)
+	
+	db.QueryRowID(`SELECT SUM(amount_received) FROM donations WHERE fund=$1`, f.ID, &amt)
+
 	f.Amount = &amt
 }
 
@@ -44,17 +45,20 @@ func FundMiddleware(next http.Handler) http.Handler {
 		}
 		var err error
 		if fundID == "default" {
-			err = DBQueryRow(`SELECT id, goal, alias, short_title, description FROM funds WHERE def = 'true'`).Scan(
+			err = db.QueryRow(
+				`SELECT id, goal, alias, short_title, description FROM funds WHERE def = 'true'`, nil,
 				&fund.ID,
 				&fund.Goal,
 				&fund.Alias,
 				&fund.ShortTitle,
 				&fund.Title,
 			)
+
 			def := true
 			fund.Default = &def
 		} else {
-			err = DBQueryRow(`SELECT def, goal, alias, short_title, description FROM funds WHERE id = $1`, fundID).Scan(
+			err = db.QueryRowID(
+				`SELECT def, goal, alias, short_title, description FROM funds WHERE id = $1`, fundID,
 				&fund.Default,
 				&fund.Goal,
 				&fund.Alias,
@@ -64,9 +68,6 @@ func FundMiddleware(next http.Handler) http.Handler {
 		}
 
 		if err != nil {
-			if !errors.Is(err, pgx.ErrNoRows) {
-				logger.Logf(LL_ERROR, `Couldn't fetch fund '%v': %v`, fundID, err)
-			}
 			RespondErr(w, ErrNotFound)
 			return
 		}
@@ -105,7 +106,7 @@ func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund
 	q += ` ORDER BY id DESC LIMIT 50`
 
 	funds := []*Fund{}
-	rows, _ := DBQuery(q, args...)
+	rows, _ := db.Query(q, args...)
 
 	for rows.Next() {
 		fund := &Fund{}
@@ -160,20 +161,16 @@ func RouterFunds() http.Handler {
 			return
 		}
 
-		aliasCount := 0
-
-		DBQueryRow(`SELECT COUNT(*) FROM funds WHERE alias = $1`, fund.Alias).Scan(&aliasCount)
-
-		if aliasCount != 0 {
+		if db.Exists(`funds`, `alias = $1`, fund.Alias) {
 			RespondErr(w, ErrNotUniqueAlias)
 			return
 		}
 
 		if *fund.Default {
-			DBExec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
+			db.Exec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
 		}
 
-		DBExec(`INSERT INTO funds (id, def, goal, alias, short_title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
+		db.Exec(`INSERT INTO funds (id, def, goal, alias, short_title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
 			fund.ID,
 			fund.Default,
 			fund.Goal,
@@ -181,6 +178,7 @@ func RouterFunds() http.Handler {
 			fund.ShortTitle,
 			fund.Title,
 		)
+
 		RespondJSON(w, 200, fund)
 		WSMgr.SendEvent(WSR_NewFund{
 			Fund: fund,
@@ -215,13 +213,18 @@ func RouterFundsID() http.Handler {
 			return
 		}
 
-		DBExec(`UPDATE funds SET goal = $1, alias = $2, short_title = $3, description = $4 WHERE id = $5`,
+		_, err := db.Exec(`UPDATE funds SET goal = $1, alias = $2, short_title = $3, description = $4 WHERE id = $5`,
 			fund.Goal,
 			fund.Alias,
 			fund.ShortTitle,
 			fund.Title,
 			fund.ID,
 		)
+
+		if err != nil {
+			RespondErr(w, ErrServerBad)
+			return
+		}
 
 		RespondSuccess(w)
 	})
@@ -231,13 +234,16 @@ func RouterFundsID() http.Handler {
 			return
 		}
 		fund := r.Context().Value(CTX_FUND).(*Fund)
+		
 		if *fund.Default {
 			RespondJSON(w, 200, fund)
 		} else {
-			DBExec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
-			DBExec(`UPDATE funds SET def = 'true' WHERE id = $1`, fund.ID)
+			db.Exec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
+			db.Exec(`UPDATE funds SET def = 'true' WHERE id = $1`, fund.ID)
+			
 			def := true
 			fund.Default = &def
+
 			RespondJSON(w, 200, fund)
 		}
 	})

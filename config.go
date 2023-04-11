@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/shadiestgoat/log"
 )
 
 type confItem struct {
@@ -100,9 +101,10 @@ func InitConfig() {
 	}
 
 	if DEBUG_DISC_WEBHOOK == "" {
-		logger.Logf(LL_WARN, "DEBUG_DISC_WEBHOOK is empty! no logs will be sent to a discord")
-	} else if DEBUG_DISC_MENTION == "" {
-		logger.Logf(LL_WARN, "DEBUG_DISC_MENTION is empty! No one will be mentioned. On debug info")
+		log.Warn("'DEBUG_DISC_WEBHOOK' is empty! no logs will be sent to a discord")
+	}
+	if DEBUG_DISC_MENTION == "" {
+		log.Warn("'DEBUG_DISC_MENTION' is empty! No one will be mentioned. On debug info")
 	}
 
 	DISCORD_OAUTH_REDIRECT = PROTOCOL_HOSTNAME + "/login"

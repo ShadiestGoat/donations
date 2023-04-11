@@ -9,6 +9,8 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/shadiestgoat/log"
 )
 
 type HTTPError struct {
@@ -59,13 +61,6 @@ func RespondSuccess(w http.ResponseWriter) {
 	Respond(w, 200, msgSucc)
 }
 
-// Panics if err != nil. Should only be used pre-server setup, or w/ debug
-func PanicIfErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 // util function to write a unified error message
 func RespondErr(w http.ResponseWriter, err *HTTPError) {
 	Respond(w, err.Status, err.CachedMsg)
@@ -87,7 +82,7 @@ func FrontendRespond(w http.ResponseWriter, r *http.Request, Page *template.Temp
 	err := Page.ExecuteTemplate(w, templateName, data)
 	if err != nil {
 		out, _ := json.Marshal(data)
-		logger.Logf(LL_ERROR, "Couldn't exec template '%v' with data '%v': %v", templateName, string(out), err)
+		log.Error("Couldn't exec template '%v' with data '%v': %v", templateName, string(out), err)
 		FrontendError(w, r, "Can't load page")
 	}
 }
@@ -112,7 +107,6 @@ func ParseJSON(w http.ResponseWriter, r *http.Request, v any) bool {
 }
 
 func RandInt(min, max int) int {
-	rand.Seed(time.Now().UnixNano())
 	return rand.Intn(max-min) + min
 }
 

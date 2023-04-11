@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/shadiestgoat/log"
 )
 
 type Permission int
@@ -34,26 +36,28 @@ var Apps = map[string]*App{}
 
 func InitAuths() {
 	f, err := os.ReadFile("auths.json")
-	PanicIfErr(err)
+	log.FatalIfErr(err, "opening 'auths.json'")
 
 	raws := []*App{}
 
 	names := map[string]bool{}
 	tokens := map[string]bool{}
 
-	PanicIfErr(json.Unmarshal(f, &raws))
+	log.FatalIfErr(json.Unmarshal(f, &raws), "parsing 'auths.json'")
 
 	largestName := 0
 	for _, app := range raws {
 		if len(app.Name) > largestName {
 			largestName = len(app.Name)
 		}
+
 		if names[app.Name] {
-			logger.Logf(LL_PANIC, "'%v' name is not unique!", app.Name)
+			log.Fatal("'%s' auth name is not unique!", app.Name)
 		}
 		if tokens[app.Token] {
-			logger.Logf(LL_PANIC, "'%v' token is not unique!", app.Token)
+			log.Fatal("'%s' token is not unique!", app.Token)
 		}
+
 		names[app.Name] = true
 		names[app.Token] = true
 	}
@@ -88,5 +92,5 @@ func InitAuths() {
 		apps += name + "\n"
 	}
 
-	logger.Logf(LL_DEBUG, "Applications loaded\n"+header+"\n\n"+apps+"\n"+header)
+	log.Success("Applications loaded\n%s\n\n%s\n%s", header, apps, header)
 }

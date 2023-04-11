@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Dextication/snowflake"
+	"github.com/shadiestgoat/log"
 )
 
 var (
@@ -16,7 +17,8 @@ var (
 
 func InitSnowflake() {
 	node, err := snowflake.NewNode(0, BASE_ID_TIME, 41, 11, 11)
-	PanicIfErr(err)
+	log.FatalIfErr(err, "creating snownode")
+	
 	SnowNode = node
 }
 

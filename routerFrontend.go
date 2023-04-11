@@ -11,6 +11,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v4"
+	"github.com/shadiestgoat/donations/db"
+	"github.com/shadiestgoat/log"
 )
 
 func FrontendError(w http.ResponseWriter, r *http.Request, err string) {
@@ -38,14 +40,14 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 
 	var err error
 	if fundID == "default" {
-		err = DBQueryRow(`SELECT id, goal, short_title, description FROM funds WHERE def = 'true'`).Scan(
+		err = db.QueryRow(`SELECT id, goal, short_title, description FROM funds WHERE def = 'true'`, nil,
 			&fund.ID,
 			&fund.Goal,
 			&fund.ShortTitle,
 			&fund.Title,
 		)
 	} else {
-		err = DBQueryRow(`SELECT goal, short_title, description FROM funds WHERE id = $1`, fundID).Scan(
+		err = db.QueryRowID(`SELECT goal, short_title, description FROM funds WHERE id = $1`, fundID, 
 			&fund.Goal,
 			&fund.ShortTitle,
 			&fund.Title,
@@ -53,9 +55,6 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 	}
 
 	if err != nil {
-		if !errors.Is(err, pgx.ErrNoRows) {
-			logger.Logf(LL_ERROR, `Couldn't fetch fund '%v': %v`, fundID, err)
-		}
 		FrontendError(w, r, "Fund not found!")
 		return
 	}
@@ -102,7 +101,7 @@ func RouterBase() *chi.Mux {
 	})
 
 	r.Get("/funds", func(w http.ResponseWriter, r *http.Request) {
-		rows, _ := DBQuery(`SELECT id,goal,short_title,description,def FROM funds WHERE complete = 'false' order by id LIMIT 50`)
+		rows, _ := db.Query(`SELECT id,goal,short_title,description,def FROM funds WHERE complete = 'false' order by id LIMIT 50`)
 		funds := []*PageFundsFund{}
 		for rows.Next() {
 			goal := 0.0
@@ -127,12 +126,13 @@ func RouterBase() *chi.Mux {
 
 	r.Get(`/f/{quickName}`, func(w http.ResponseWriter, r *http.Request) {
 		id := ""
-		err := DBQueryRow(`SELECT id FROM funds WHERE alias = $1`, chi.URLParam(r, "quickName")).Scan(&id)
+		
+		err := db.QueryRowID(`SELECT id FROM funds WHERE alias = $1`, chi.URLParam(r, "quickName"), &id)
+
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
 				FrontendError(w, r, "404 Not Found")
 			} else {
-				logger.Logf(LL_ERROR, "Couldn't fetch: %v", err)
 				FrontendError(w, r, "Unknown Error")
 			}
 			return
@@ -166,8 +166,10 @@ func RouterBase() *chi.Mux {
 				b, _ := io.ReadAll(resp.Body)
 				fmt.Println(resp.StatusCode, string(b))
 			}
-			logger.Logf(LL_ERROR, "Couldn't login user!")
+			
+			log.Error("Couldn't login user!")
 			FrontendError(w, r, "Unknown Error")
+
 			return
 		}
 
@@ -176,9 +178,10 @@ func RouterBase() *chi.Mux {
 
 		err = json.Unmarshal(b, auth)
 
-		if err != nil {
-			logger.Logf(LL_ERROR, "Couldn't login user: %v\n%v", err, string(b))
+		if log.ErrorIfErr(err, "parsing login user") {
+			log.Error(string(b))
 			FrontendError(w, r, "Unknown Error")
+			
 			return
 		}
 

@@ -1,10 +1,9 @@
 package main
 
 import (
-	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/shadiestgoat/donations/db"
 )
 
 type DonorInfo struct {
@@ -41,26 +40,26 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 	donor := &Donor{
 		ID: id,
 	}
-	err := DBQueryRow(`SELECT discord_id, paypal, cycle FROM donors WHERE id = $1`, id).Scan(
+
+	err := db.QueryRowID(`SELECT discord_id, paypal, cycle FROM donors WHERE id = $1`, id,
 		&donor.DiscordID,
 		&donor.PayPal,
 		&donor.CycleDay,
 	)
+
 	if err != nil {
-		if !errors.Is(err, pgx.ErrNoRows) {
-			logger.Logf(LL_ERROR, `Couldn't fetch payer from DB: %v`, err)
-		}
 		return &ProfileResponse{
 			Donors:    []*Donor{},
 			Total:     &DonorInfo{},
 			Donations: &[]*Donation{},
 		}
 	}
+
 	now := time.Now()
 	cycle := PayCycle(donor.CycleDay, now)
 
 	if resolve {
-		rows, _ := DBQuery(`SELECT id, order_id, capture_id, amount, message, fund FROM donations WHERE donor = $1 ORDER BY id DESC`, id)
+		rows, _ := db.Query(`SELECT id, order_id, capture_id, amount, message, fund FROM donations WHERE donor = $1 ORDER BY id DESC`, id)
 		donations := []*Donation{}
 		total := &DonorInfo{
 			Total: 0,
@@ -78,6 +77,7 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 			}
 			donations = append(donations, donation)
 		}
+		
 		return &ProfileResponse{
 			Donors:    []*Donor{donor},
 			Total:     total,
@@ -85,8 +85,10 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 		}
 	} else {
 		total, monthly := 0.0, 0.0
-		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1`, id).Scan(&total)
-		DBQueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1 AND id >= $2`, id, TimeToSnow(cycle)).Scan(&monthly)
+		
+		db.QueryRowID(`SELECT SUM(amount) FROM donations WHERE donor = $1`, id, &total)
+		db.QueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1 AND id >= $2`, []any{id, TimeToSnow(cycle)}, &monthly)
+
 		return &ProfileResponse{
 			Donors: []*Donor{
 				donor,
@@ -101,7 +103,8 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 }
 
 func FetchProfileByX(columnName string, id string, resolve bool) *ProfileResponse {
-	rows, _ := DBQuery(`SELECT id FROM donors WHERE `+columnName+` = $1`, id)
+	rows, _ := db.Query(`SELECT id FROM donors WHERE `+columnName+` = $1`, id)
+
 	resp := &ProfileResponse{
 		Donors:    []*Donor{},
 		Total:     &DonorInfo{},

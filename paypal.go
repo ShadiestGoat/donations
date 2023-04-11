@@ -2,6 +2,8 @@ package main
 
 import (
 	"strings"
+
+	"github.com/shadiestgoat/donations/db"
 )
 
 // the name of the allowed pp event
@@ -94,11 +96,8 @@ func (e PPEventRaw) Parse() *PPDonation {
 	capture := unit.Payments.Captures[0]
 
 	spl := strings.Split(unit.Items[0].Name, "-")
-	count := 0
 
-	DBQueryRow(`SELECT COUNT(*) FROM funds WHERE id = $1`, spl[1]).Scan(&count)
-
-	if count == 0 {
+	if db.Exists(`funds`, `id = $1`, spl[1]) {
 		return nil
 	}
 

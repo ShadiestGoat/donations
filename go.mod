@@ -1,9 +1,9 @@
-module github.com/ShadiestGoat/DonationAPI
+module github.com/shadiestgoat/donations
 
-go 1.19
+go 1.20
 
 require (
-	github.com/fatih/color v1.13.0
+	github.com/fatih/color v1.15.0 // indirect
 	github.com/joho/godotenv v1.4.0
 )
 
@@ -25,7 +25,9 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/gorilla/websocket v1.5.0
 	github.com/jackc/pgx/v4 v4.17.2
-	github.com/mattn/go-colorable v0.1.9 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
-	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.18 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 )
+
+require github.com/shadiestgoat/log v1.0.2 // indirect
