@@ -37,7 +37,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 
-	if err != nil {
+	if log.ErrorIfErr(err, "upgrading ws") {
 		Respond(w, 501, []byte(`{"error": "`+err.Error()+`"}`))
 		return
 	}
