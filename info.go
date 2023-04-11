@@ -86,8 +86,8 @@ func FetchProfileByDonor(id string, resolve bool) *ProfileResponse {
 	} else {
 		total, monthly := 0.0, 0.0
 		
-		db.QueryRowID(`SELECT SUM(amount) FROM donations WHERE donor = $1`, id, &total)
-		db.QueryRow(`SELECT SUM(amount) FROM donations WHERE donor = $1 AND id >= $2`, []any{id, TimeToSnow(cycle)}, &monthly)
+		db.QueryRowID(`SELECT COALESCE(SUM(amount), 0) FROM donations WHERE donor = $1`, id, &total)
+		db.QueryRow(`SELECT COALESCE(SUM(amount), 0) FROM donations WHERE donor = $1 AND id >= $2`, []any{id, TimeToSnow(cycle)}, &monthly)
 
 		return &ProfileResponse{
 			Donors: []*Donor{

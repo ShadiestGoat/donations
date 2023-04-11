@@ -28,7 +28,7 @@ const (
 func (f *Fund) PopulateAmount() {
 	amt := 0.0
 	
-	db.QueryRowID(`SELECT SUM(amount_received) FROM donations WHERE fund=$1`, f.ID, &amt)
+	db.QueryRowID(`SELECT COALESCE(SUM(amount_received), 0) FROM donations WHERE fund=$1`, f.ID, &amt)
 
 	f.Amount = &amt
 }
