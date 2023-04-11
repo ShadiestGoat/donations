@@ -174,7 +174,10 @@ func (mgr *WSMgrT) Ping() {
 			wg.Done()
 		}(id, c)
 	}
+	
 	wg.Wait()
+	
+	log.Debug("Finished Ping <3")
 }
 
 func init() {
