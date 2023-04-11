@@ -12,8 +12,8 @@ const sql_SETUP_DONATIONS = `CREATE TABLE IF NOT EXISTS donations (
 	order_id        TEXT UNIQUE,
 	capture_id      TEXT UNIQUE,
 	donor           TEXT,
-	amount          NUMERIC(6, 2),
-	amount_received NUMERIC(6, 2),
+	amount          NUMERIC(6, 2) NOT NULL,
+	amount_received NUMERIC(6, 2) NOT NULL,
 	message         VARCHAR(128),
 	fund            TEXT,
 	
