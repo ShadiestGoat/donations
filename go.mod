@@ -30,4 +30,7 @@ require (
 	golang.org/x/sys v0.7.0 // indirect
 )
 
-require github.com/shadiestgoat/log v1.0.2
+require (
+	github.com/chzyer/readline v1.5.1
+	github.com/shadiestgoat/log v1.0.2
+)

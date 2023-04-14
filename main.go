@@ -14,11 +14,11 @@ import (
 )
 
 func main() {
-	InitConfig()
+	// InitConfig()
 	os.Setenv("TZ", "UTC")
 
 	cbs := []log.LogCB{
-		log.NewLoggerFile("log"), log.NewLoggerPrint(),
+		log.NewLoggerPrint(), log.NewLoggerFile("log"),
 	}
 
 	if DEBUG_DISC_WEBHOOK != "" {
@@ -42,7 +42,7 @@ func main() {
 
 	log.Success("Frontend loaded!")
 
-	db.Init(DB_URI)
+	// db.Init(DB_URI)
 	log.Success("Database connected!")
 
 	defer db.Close()
@@ -65,12 +65,17 @@ func main() {
 	}()
 
 	stopper := make(chan os.Signal, 2)
-
 	signal.Notify(stopper, os.Interrupt)
 
 	log.Success("Everything is ready! You can now press Ctrl+C to shut down <3")
+	log.PrintSuccess("Also - you can now do 'reload' to reload the 'auths.json' file!")
 
-	<-stopper
+	readLineStopper := make(chan bool)
+	go processCMD(readLineStopper)
+
+	<- stopper
+
+	readLineStopper <- true
 
 	log.Warn("Shutting down :(")
 
