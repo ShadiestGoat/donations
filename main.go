@@ -35,7 +35,6 @@ func main() {
 	log.Success("Config & Log loaded!")
 
 	auth.Load()
-	InitSnowflake()
 
 	log.Success("Snowflake loaded!")
 
