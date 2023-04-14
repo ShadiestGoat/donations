@@ -121,6 +121,45 @@ func FetchFunds(before, after string, complete *bool, fetchAmounts bool) []*Fund
 	return funds
 }
 
+func NewFund(fund *Fund) error {
+	if fund == nil {
+		return nil
+	}
+
+	if fund.Default == nil {
+		def := true
+		fund.Default = &def
+	}
+	fund.ID = SnowNode.Generate().String()
+
+	if fund.Alias == "" || fund.ShortTitle == "" || fund.Title == "" {
+		return ErrBadBody
+	}
+
+	if db.Exists(`funds`, `alias = $1`, fund.Alias) {
+		return ErrBadBody
+	}
+
+	if *fund.Default {
+		db.Exec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
+	}
+
+	db.Exec(`INSERT INTO funds (id, def, goal, alias, short_title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
+		fund.ID,
+		fund.Default,
+		fund.Goal,
+		fund.Alias,
+		fund.ShortTitle,
+		fund.Title,
+	)
+
+	WSMgr.SendEvent(WSR_NewFund{
+		Fund: fund,
+	}.WSEvent())
+
+	return nil
+}
+
 func RouterFunds() http.Handler {
 	r := chi.NewRouter()
 
@@ -151,39 +190,14 @@ func RouterFunds() http.Handler {
 		if ParseJSON(w, r, fund) {
 			return
 		}
-		if fund.Default == nil {
-			def := true
-			fund.Default = &def
-		}
-		fund.ID = SnowNode.Generate().String()
 
-		if fund.Alias == "" || fund.ShortTitle == "" || fund.Title == "" {
-			RespondErr(w, ErrBadBody)
-			return
+		err := NewFund(fund)
+		
+		if err != nil {
+			RespondErr(w, err.(*HTTPError))
 		}
-
-		if db.Exists(`funds`, `alias = $1`, fund.Alias) {
-			RespondErr(w, ErrNotUniqueAlias)
-			return
-		}
-
-		if *fund.Default {
-			db.Exec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
-		}
-
-		db.Exec(`INSERT INTO funds (id, def, goal, alias, short_title, description) VALUES ($1, $2, $3, $4, $5, $6)`,
-			fund.ID,
-			fund.Default,
-			fund.Goal,
-			fund.Alias,
-			fund.ShortTitle,
-			fund.Title,
-		)
 
 		RespondJSON(w, 200, fund)
-		WSMgr.SendEvent(WSR_NewFund{
-			Fund: fund,
-		}.WSEvent())
 	})
 
 	r.Mount(`/{fundID}`, RouterFundsID())
