@@ -18,7 +18,7 @@ func main() {
 	os.Setenv("TZ", "UTC")
 
 	cbs := []log.LogCB{
-		log.NewLoggerPrint(), log.NewLoggerFile("log"),
+		log.NewLoggerPrint(), log.NewLoggerFile("logs/log"),
 	}
 
 	if DEBUG_DISC_WEBHOOK != "" {
