@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -200,6 +201,15 @@ func RouterBase() *chi.Mux {
 	r.Get("/defaultPFP.png", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/png")
 		Respond(w, 200, DEFAULT_PFP)
+	})
+
+	r.Get(`/favicon.ico`, func(w http.ResponseWriter, r *http.Request) {
+		f, err := os.Open("favicon.ico")
+		if err != nil {
+			RespondErr(w, ErrNotFound)
+		}
+		w.WriteHeader(200)
+		io.Copy(w, f)
 	})
 
 	return r
