@@ -74,7 +74,12 @@ Once the app is started, you can input commands into it! Currently only 2 are su
 
 ## Tools
 
-Docs are a work in progress...
+[I made a GO API wrapper here](https://github.com/ShadiestGoat/donation-api-wrapper)
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/ShadiestGoat/donation-api-wrapper.svg)](https://pkg.go.dev/github.com/ShadiestGoat/donation-api-wrapper)
+
+TODO: You can also host this discord bot, which has fully API coverage (including editing funds, etc)
+
 
 ## Favicon
 
