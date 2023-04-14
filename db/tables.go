@@ -2,8 +2,8 @@ package db
 
 // array of [2]string{SQL statement, context}
 var setup = [][2]string{
-	{sql_SETUP_DONORS,    "creating the donor table"},
-	{sql_SETUP_FUNDS,     "creating the fund table"},
+	{sql_SETUP_DONORS, "creating the donor table"},
+	{sql_SETUP_FUNDS, "creating the fund table"},
 	{sql_SETUP_DONATIONS, "creating the donations table"},
 }
 
@@ -25,7 +25,7 @@ const sql_SETUP_DONATIONS = `CREATE TABLE IF NOT EXISTS donations (
 		FOREIGN KEY(fund)
 			REFERENCES funds(id)
 )`
-	
+
 const sql_SETUP_DONORS = `CREATE TABLE IF NOT EXISTS donors (
 	id          TEXT PRIMARY KEY,
 	discord_id  TEXT,
@@ -34,7 +34,7 @@ const sql_SETUP_DONORS = `CREATE TABLE IF NOT EXISTS donors (
 	CONSTRAINT uq_donor 
 		UNIQUE(discord_id, paypal)
 )`
-	
+
 const sql_SETUP_FUNDS = `CREATE TABLE IF NOT EXISTS funds (
 	id TEXT PRIMARY KEY,
 	def BOOLEAN DEFAULT false,
