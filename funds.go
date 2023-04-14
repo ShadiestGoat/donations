@@ -28,7 +28,7 @@ const (
 
 func (f *Fund) PopulateAmount() {
 	amt := 0.0
-	
+
 	db.QueryRowID(`SELECT COALESCE(SUM(amount_received), 0) FROM donations WHERE fund=$1`, f.ID, &amt)
 
 	f.Amount = &amt
@@ -192,7 +192,7 @@ func RouterFunds() http.Handler {
 		}
 
 		err := NewFund(fund)
-		
+
 		if err != nil {
 			RespondErr(w, err.(*HTTPError))
 		}
@@ -249,13 +249,13 @@ func RouterFundsID() http.Handler {
 			return
 		}
 		fund := r.Context().Value(CTX_FUND).(*Fund)
-		
+
 		if *fund.Default {
 			RespondJSON(w, 200, fund)
 		} else {
 			db.Exec(`UPDATE funds SET def = 'false' WHERE def = 'true'`)
 			db.Exec(`UPDATE funds SET def = 'true' WHERE id = $1`, fund.ID)
-			
+
 			def := true
 			fund.Default = &def
 

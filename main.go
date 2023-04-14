@@ -73,7 +73,7 @@ func main() {
 	readLineStopper := make(chan bool)
 	go processCMD(readLineStopper)
 
-	<- stopper
+	<-stopper
 
 	readLineStopper <- true
 

@@ -28,7 +28,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	if NoPermHTTP(w, r, auth.PERM_LIVE_NOTIFICATION) {
 		return
 	}
-	
+
 	app := auth.FetchApp(r.Header.Get("Authorization"))
 
 	if _, ok := WSMgr.Connections[app.Token]; ok {
@@ -110,9 +110,9 @@ func (mgr *WSMgrT) Remove(token string, reason string) {
 	defer mgr.Lock.Unlock()
 
 	log.Debug("Bam - removing connection")
-	
+
 	conn := mgr.Connections[token]
-	conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(5 * time.Second))
+	conn.WriteControl(websocket.CloseMessage, []byte{}, time.Now().Add(5*time.Second))
 	conn.Close()
 	delete(mgr.Connections, token)
 
@@ -175,9 +175,9 @@ func (mgr *WSMgrT) Ping() {
 			wg.Done()
 		}(id, c)
 	}
-	
+
 	wg.Wait()
-	
+
 	log.Debug("Finished Ping <3")
 }
 

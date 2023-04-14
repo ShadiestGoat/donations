@@ -28,7 +28,7 @@ func printState(s int) {
 
 func processCMD(closer chan bool) {
 	home, _ := os.UserHomeDir()
-	
+
 	if home == "" {
 		home = "/tmp"
 	}
@@ -42,8 +42,8 @@ func processCMD(closer chan bool) {
 
 	log.FatalIfErr(err, "making new readline reader")
 
-	go func ()  {
-		<- closer
+	go func() {
+		<-closer
 		l.Close()
 	}()
 
@@ -102,9 +102,9 @@ func processCMD(closer chan bool) {
 				} else {
 					fundState++
 					newFund.Alias = line
-				}		
+				}
 			}
-			
+
 			if fundState == 6 {
 				NewFund(newFund)
 				fundState = 0
@@ -116,9 +116,9 @@ func processCMD(closer chan bool) {
 			if line == "" {
 				continue
 			}
-	
+
 			words := strings.Split(line, " ")
-	
+
 			switch {
 			case words[0] == "reload":
 				log.Debug("Reloading the auth.json file...")

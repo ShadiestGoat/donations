@@ -221,9 +221,9 @@ func RouterAPI() http.Handler {
 		}
 
 		log.Success("Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
-		
+
 		RespondSuccess(w)
-		
+
 		WSMgr.SendEvent(WSR_NewDon{
 			Donation: &Donation{
 				ID:        donationID,

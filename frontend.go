@@ -38,7 +38,7 @@ func NewComponentGoal(goal float64, currentFund float64) *ComponentGoal {
 		GoalValue:   Round(goal, 2),
 		XPercOffset: Round(textOffset, 2),
 		Perc:        Round(perc*100, 0),
-		Width:       Round(width * 100, 1),
+		Width:       Round(width*100, 1),
 	}
 }
 
@@ -66,9 +66,9 @@ var (
 	MAIN_CSS    []byte
 	DEFAULT_PFP []byte
 
-	PAGE_FUNDS *template.Template
-	PAGE_FUND  *template.Template
-	PAGE_ERROR []byte
+	PAGE_FUNDS  *template.Template
+	PAGE_FUND   *template.Template
+	PAGE_ERROR  []byte
 	PAGE_THANKS []byte
 )
 
@@ -94,13 +94,13 @@ func InitFrontend() {
 
 	fundsRaw, err := os.ReadFile("pages/funds.html")
 	log.FatalIfErr(err, "opening the 'funds' image")
-	
+
 	PAGE_FUNDS, err = template.New("funds").Parse(string(fundsRaw))
 	log.FatalIfErr(err, "parsing/creating the 'funds' template")
-	
+
 	PAGE_ERROR, err = os.ReadFile("pages/error.html")
 	log.FatalIfErr(err, "opening the error page")
-	
+
 	PAGE_THANKS, err = os.ReadFile("pages/thanks.html")
 	log.FatalIfErr(err, "opening the 'thanks' page")
 }

@@ -80,7 +80,6 @@ Once the app is started, you can input commands into it! Currently only 2 are su
 
 TODO: You can also host this discord bot, which has fully API coverage (including editing funds, etc)
 
-
 ## Favicon
 
 You can add a custom favicon by placing one in `pages/favicon.ico`

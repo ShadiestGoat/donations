@@ -18,7 +18,7 @@ var (
 func init() {
 	node, err := snowflake.NewNode(0, BASE_ID_TIME, 41, 11, 11)
 	log.FatalIfErr(err, "creating snownode")
-	
+
 	SnowNode = node
 }
 

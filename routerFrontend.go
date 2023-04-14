@@ -48,7 +48,7 @@ func FrontendFund(w http.ResponseWriter, r *http.Request, fundID string) {
 			&fund.Title,
 		)
 	} else {
-		err = db.QueryRowID(`SELECT goal, short_title, description FROM funds WHERE id = $1`, fundID, 
+		err = db.QueryRowID(`SELECT goal, short_title, description FROM funds WHERE id = $1`, fundID,
 			&fund.Goal,
 			&fund.ShortTitle,
 			&fund.Title,
@@ -127,7 +127,7 @@ func RouterBase() *chi.Mux {
 
 	r.Get(`/f/{quickName}`, func(w http.ResponseWriter, r *http.Request) {
 		id := ""
-		
+
 		err := db.QueryRowID(`SELECT id FROM funds WHERE alias = $1`, chi.URLParam(r, "quickName"), &id)
 
 		if err != nil {
@@ -167,7 +167,7 @@ func RouterBase() *chi.Mux {
 				b, _ := io.ReadAll(resp.Body)
 				fmt.Println(resp.StatusCode, string(b))
 			}
-			
+
 			log.Error("Couldn't login user!")
 			FrontendError(w, r, "Unknown Error")
 
@@ -182,7 +182,7 @@ func RouterBase() *chi.Mux {
 		if log.ErrorIfErr(err, "parsing login user") {
 			log.Error(string(b))
 			FrontendError(w, r, "Unknown Error")
-			
+
 			return
 		}
 
