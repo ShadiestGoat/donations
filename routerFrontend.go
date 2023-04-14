@@ -204,7 +204,7 @@ func RouterBase() *chi.Mux {
 	})
 
 	r.Get(`/favicon.ico`, func(w http.ResponseWriter, r *http.Request) {
-		f, err := os.Open("favicon.ico")
+		f, err := os.Open("pages/favicon.ico")
 		if err != nil {
 			RespondErr(w, ErrNotFound)
 		}
