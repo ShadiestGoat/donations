@@ -68,7 +68,9 @@ Once the app is started, you can input commands into it! Currently only 2 are su
 
 `reload` - This will reload the `auths.json` file. Use this if you want to add/remove application permissions, or applications in general
 
-`fund` - Enter a CLI Input menu that will help with creating a new fund 
+`fund` - Enter a CLI Input menu that will help with creating a new fund
+
+> Please not only external tools are currently capable of editing a fund!
 
 ## Tools
 
