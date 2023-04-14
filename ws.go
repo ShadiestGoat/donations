@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/shadiestgoat/donations/auth"
 	"github.com/shadiestgoat/log"
 )
 
@@ -24,11 +25,11 @@ var upgrader = websocket.Upgrader{
 }
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
-	if NoPermHTTP(w, r, PERM_LIVE_NOTIFICATION) {
+	if NoPermHTTP(w, r, auth.PERM_LIVE_NOTIFICATION) {
 		return
 	}
 	
-	app := Apps[r.Header.Get("Authorization")]
+	app := auth.FetchApp(r.Header.Get("Authorization"))
 
 	if _, ok := WSMgr.Connections[app.Token]; ok {
 		RespondErr(w, ErrDoubleAccess)
@@ -81,7 +82,7 @@ func (e WSR_NewFund) WSEvent() WSEvent {
 type WSEvent struct {
 	Type EventType       `json:"event"`
 	Body json.RawMessage `json:"body"`
-	Perm Permission      `json:"-"`
+	Perm auth.Permission `json:"-"`
 }
 
 type WSMgrT struct {
@@ -103,7 +104,7 @@ func (mgr *WSMgrT) Add(token string, conn *websocket.Conn) {
 }
 
 func (mgr *WSMgrT) Remove(token string, reason string) {
-	log.Warn("Closing WS Connection for '%v': %v", Apps[token].Name, reason)
+	log.Warn("Closing WS Connection for '%v': %v", auth.FetchApp(token).Name, reason)
 
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
@@ -126,7 +127,7 @@ func (mgr *WSMgrT) SendEvent(e WSEvent) {
 	defer mgr.Lock.Unlock()
 
 	for token, c := range mgr.Connections {
-		if HasPerm(token, e.Perm) {
+		if auth.HasPerm(token, e.Perm) {
 			c.WritePreparedMessage(prepared)
 		}
 	}

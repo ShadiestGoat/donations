@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/shadiestgoat/donations/auth"
 	"github.com/shadiestgoat/donations/db"
 	"github.com/shadiestgoat/log"
 )
@@ -33,7 +34,7 @@ func main() {
 
 	log.Success("Config & Log loaded!")
 
-	InitAuths()
+	auth.Load()
 	InitSnowflake()
 
 	log.Success("Snowflake loaded!")
@@ -53,11 +54,11 @@ func main() {
 	log.Success("Server started!")
 
 	server := &http.Server{
-		Addr: ":" + PORT,
+		Addr:    ":" + PORT,
 		Handler: r,
 	}
 
-	go func ()  {
+	go func() {
 		err := server.ListenAndServe()
 		if !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal("HTTP server shut down: %s", err.Error())
@@ -70,11 +71,11 @@ func main() {
 
 	log.Success("Everything is ready! You can now press Ctrl+C to shut down <3")
 
-	<- stopper
+	<-stopper
 
 	log.Warn("Shutting down :(")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 
 	server.Shutdown(ctx)
 

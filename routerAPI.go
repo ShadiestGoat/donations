@@ -11,33 +11,30 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v4"
+	"github.com/shadiestgoat/donations/auth"
 	"github.com/shadiestgoat/donations/db"
 	"github.com/shadiestgoat/log"
 )
 
 // Handles authentication & responses.
 // Returns true if the request's app doesn't have the perm for this route
-func NoPermHTTP(w http.ResponseWriter, r *http.Request, perm Permission) bool {
+func NoPermHTTP(w http.ResponseWriter, r *http.Request, perm auth.Permission) bool {
 	token := r.Header.Get("Authorization")
-	app, ok := Apps[token]
 
-	if token == "" || !ok {
+	app := auth.FetchApp(token)
+
+	if token == "" || app == nil {
 		RespondErr(w, ErrNotAuthorized)
 		return true
 	}
 
-	if HasPerm(token, perm) {
+	if auth.HasPerm(token, perm) {
 		log.Debug(`[%s]: Requested '%s`, app.Name, r.URL)
 		return false
 	}
 
 	RespondErr(w, ErrNotAuthorized)
 	return true
-}
-
-// Returns true if app with 'token' has this permission
-func HasPerm(token string, perm Permission) bool {
-	return perm&Apps[token].Perms == perm || Apps[token].Perms == PERM_ADMIN
 }
 
 func RouterDonors() http.Handler {
@@ -71,7 +68,7 @@ func RouterAPI() http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/discordToken", func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_DISCORD_TOKEN) {
+		if NoPermHTTP(w, r, auth.PERM_DISCORD_TOKEN) {
 			return
 		}
 		Respond(w, 200, []byte(`{"token": "`+DISCORD_TOKEN+`"}`))
@@ -83,7 +80,7 @@ func RouterAPI() http.Handler {
 	r.HandleFunc("/ws", socketHandler)
 
 	r.Get(`/donations`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FETCH_DONATIONS) {
+		if NoPermHTTP(w, r, auth.PERM_FETCH_DONATIONS) {
 			return
 		}
 		before := r.URL.Query().Get("before")

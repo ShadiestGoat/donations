@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/shadiestgoat/donations/auth"
 	"github.com/shadiestgoat/donations/db"
 )
 
@@ -143,7 +144,7 @@ func RouterFunds() http.Handler {
 
 	// Create a new fund
 	r.Post(`/`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {
+		if NoPermHTTP(w, r, auth.PERM_FUND_CONTROL) {
 			return
 		}
 		fund := &Fund{}
@@ -204,7 +205,7 @@ func RouterFundsID() http.Handler {
 
 	// Replace a fund's settings (except default)
 	r.Put(`/`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {
+		if NoPermHTTP(w, r, auth.PERM_FUND_CONTROL) {
 			return
 		}
 		fund := &Fund{}
@@ -230,7 +231,7 @@ func RouterFundsID() http.Handler {
 	})
 
 	r.Post(`/default`, func(w http.ResponseWriter, r *http.Request) {
-		if NoPermHTTP(w, r, PERM_FUND_CONTROL) {
+		if NoPermHTTP(w, r, auth.PERM_FUND_CONTROL) {
 			return
 		}
 		fund := r.Context().Value(CTX_FUND).(*Fund)

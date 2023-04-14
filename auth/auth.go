@@ -1,9 +1,11 @@
-package main
+package auth
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/shadiestgoat/log"
 )
@@ -34,28 +36,64 @@ type App struct {
 
 var Apps = map[string]*App{}
 
-func InitAuths() {
+var appLock = &sync.RWMutex{}
+
+func FetchApp(token string) *App {
+	appLock.RLock()
+	defer appLock.RUnlock()
+
+	return Apps[token]
+}
+
+// Returns true if app with 'token' has this permission
+func HasPerm(token string, perm Permission) bool {
+	appLock.RLock()
+	defer appLock.RUnlock()
+
+	if Apps[token] == nil {
+		return false
+	}
+
+	return perm&Apps[token].Perms == perm || Apps[token].Perms == PERM_ADMIN
+}
+
+func Load() {
+	appLock.Lock()
+	defer appLock.Unlock()
+
+	Apps = map[string]*App{}
+
 	f, err := os.ReadFile("auths.json")
-	log.FatalIfErr(err, "opening 'auths.json'")
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			log.FatalIfErr(err, "opening 'auths.json'")
+		}
+		log.Warn("Couldn't find the 'auths.json' file, are you sure it exists?")
+		return
+	}
 
 	raws := []*App{}
 
 	names := map[string]bool{}
 	tokens := map[string]bool{}
 
-	log.FatalIfErr(json.Unmarshal(f, &raws), "parsing 'auths.json'")
+	err = json.Unmarshal(f, &raws)
+	if log.ErrorIfErr(err, "parsing 'auths.json'") {
+		log.Warn("Couldn't parse 'auths.json', are you sure it is valid")
+	}
 
 	largestName := 0
+
 	for _, app := range raws {
 		if len(app.Name) > largestName {
 			largestName = len(app.Name)
 		}
 
 		if names[app.Name] {
-			log.Fatal("'%s' auth name is not unique!", app.Name)
+			log.Error("'%s' auth name is not unique!", app.Name)
 		}
 		if tokens[app.Token] {
-			log.Fatal("'%s' token is not unique!", app.Token)
+			log.Error("'%s' token is not unique!", app.Token)
 		}
 
 		names[app.Name] = true
