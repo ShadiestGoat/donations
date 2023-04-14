@@ -43,11 +43,16 @@ func processCMD(closer chan bool) {
 			continue
 		}
 
-		switch line {
-		case "reload":
+		words := strings.Split(line, " ")
+
+		switch {
+		case words[0] == "reload":
 			log.Debug("Reloading the auth.json file...")
 			time.Sleep(50 * time.Millisecond)
 			auth.Load()
+		case words[0] == "fund":
+			// TODO:
+		default:
 		}
 	}
 }
