@@ -83,6 +83,7 @@ func (e PPEventRaw) Parse() *PPDonation {
 	if len(e.Resource.PurchaseUnits) == 0 {
 		return nil
 	}
+
 	unit := e.Resource.PurchaseUnits[0]
 	if len(unit.Items) == 0 {
 		return nil
@@ -93,11 +94,12 @@ func (e PPEventRaw) Parse() *PPDonation {
 	if len(unit.Payments.Captures) == 0 {
 		return nil
 	}
+	
 	capture := unit.Payments.Captures[0]
 
 	spl := strings.Split(unit.Items[0].Name, "-")
 
-	if db.Exists(`funds`, `id = $1`, spl[1]) {
+	if !db.Exists(`funds`, `id = $1`, spl[1]) {
 		return nil
 	}
 
