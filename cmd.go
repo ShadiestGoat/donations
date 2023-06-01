@@ -37,7 +37,7 @@ func processCMD(closer chan bool) {
 		Prompt:            "",
 		HistoryFile:       home + "/.donationAPI_history",
 		HistorySearchFold: true,
-		InterruptPrompt:   "",
+		InterruptPrompt:   "\n",
 	})
 
 	log.FatalIfErr(err, "making new readline reader")
