@@ -108,11 +108,11 @@ func RouterAPI() http.Handler {
 		}
 
 		if before != "" {
-			checks = append(checks, "id <= ")
+			checks = append(checks, "id < ")
 			args = append(args, before)
 		}
 		if after != "" {
-			checks = append(checks, "id >= ")
+			checks = append(checks, "id > ")
 			args = append(args, after)
 		}
 
