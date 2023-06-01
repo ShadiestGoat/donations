@@ -115,7 +115,7 @@ func RouterAPI() http.Handler {
 			checks = append(checks, "id >= ")
 			args = append(args, after)
 		}
-		
+
 		if len(checks) != 0 {
 			q += " WHERE "
 		}
@@ -177,6 +177,10 @@ func RouterAPI() http.Handler {
 		}
 
 		donorID, cycle := "", 0
+
+		if donation.DiscordID == "anon" {
+			donation.DiscordID = ""
+		}
 
 		err = db.QueryRow(`SELECT id, cycle FROM donors WHERE discord_id = $1 AND paypal = $2`, []any{donation.DiscordID, donation.PayerID}, &donorID, &cycle)
 
