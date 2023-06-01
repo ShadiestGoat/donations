@@ -155,7 +155,6 @@ func init() {
 func (mgr *WSMgrT) Ping() {
 	mgr.Lock.Lock()
 	defer mgr.Lock.Unlock()
-	log.Debug("Ping")
 
 	wg := &sync.WaitGroup{}
 
@@ -177,8 +176,6 @@ func (mgr *WSMgrT) Ping() {
 	}
 
 	wg.Wait()
-
-	log.Debug("Finished Ping <3")
 }
 
 func init() {

@@ -150,8 +150,6 @@ func RouterAPI() http.Handler {
 
 			RespondErr(w, ErrBadBody)
 			return
-		} else {
-			log.Success("New Donation parsed!\nPayerID: %v\nOrder/Capture IDs: %v %v\nAmount Donated: %v\nAmount Received: %v\nMessage: %v", donation.PayerID, donation.OrderID, donation.CaptureID, donation.AmountDonated, donation.AmountReceived, donation.Description)
 		}
 
 		if donation.DiscordID == "" {
