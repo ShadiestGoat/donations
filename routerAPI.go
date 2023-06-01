@@ -115,8 +115,9 @@ func RouterAPI() http.Handler {
 			checks = append(checks, "id >= ")
 			args = append(args, after)
 		}
+		
 		if len(checks) != 0 {
-			q += " WHERE"
+			q += " WHERE "
 		}
 
 		for argIndex, check := range checks {
