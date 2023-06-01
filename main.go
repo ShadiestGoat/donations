@@ -15,6 +15,7 @@ import (
 
 func main() {
 	InitConfig()
+	
 	os.Setenv("TZ", "UTC")
 
 	cbs := []log.LogCB{
@@ -42,7 +43,7 @@ func main() {
 
 	log.Success("Frontend loaded!")
 
-	// db.Init(DB_URI)
+	db.Init(DB_URI)
 	log.Success("Database connected!")
 
 	defer db.Close()
@@ -63,6 +64,8 @@ func main() {
 			log.Fatal("HTTP server shut down: %s", err.Error())
 		}
 	}()
+
+	log.Debug("Running server on *:%v", PORT)
 
 	stopper := make(chan os.Signal, 2)
 	signal.Notify(stopper, os.Interrupt)
