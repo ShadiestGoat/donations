@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	// InitConfig()
+	InitConfig()
 	os.Setenv("TZ", "UTC")
 
 	cbs := []log.LogCB{
