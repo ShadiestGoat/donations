@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -89,6 +90,23 @@ func RouterAPI() http.Handler {
 		q := `SELECT id,donor,amount,message,fund FROM donations`
 		args := []any{}
 		checks := []string{}
+
+		qSplit := strings.Split(r.URL.RawQuery, "&")
+
+		order := "DESC"
+
+		for _, rawQ := range qSplit {
+			rawV := strings.Split(rawQ, "=")
+			v := rawV[0]
+
+			if v == "before" {
+				order = "DESC"
+				break
+			} else if v == "after" {
+				order = "ASC"
+			}
+		}
+
 		if before != "" {
 			checks = append(checks, "id <= ")
 			args = append(args, before)
@@ -108,7 +126,7 @@ func RouterAPI() http.Handler {
 			q += check + "$" + fmt.Sprint(argIndex+1)
 		}
 
-		q += ` ORDER BY id DESC LIMIT 50`
+		q += ` ORDER BY id ` + order + ` LIMIT 50`
 
 		donos := []*Donation{}
 		rows, _ := db.Query(q, args...)

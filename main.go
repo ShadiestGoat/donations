@@ -82,9 +82,8 @@ func main() {
 
 	log.Warn("Shutting down :(")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	server.Shutdown(ctx)
-
-	cancel()
 }
